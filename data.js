@@ -1,0 +1,201 @@
+// =====================
+// 점(占)심(心)도사 — 핵심 데이터
+// 64괘 + 타로 78장 + 오행 음식
+// =====================
+
+// =====================
+// 주역 64괘 전체
+// =====================
+const GUA = [
+  { symbol:'䷀', name:'건괘 (乾卦)', num:'제1괘', keyword:'하늘 · 강건', meaning:'강한 의지로 나아갈 때입니다. 주저하지 마세요.' },
+  { symbol:'䷁', name:'곤괘 (坤卦)', num:'제2괘', keyword:'땅 · 순응', meaning:'조용히 기다리며 힘을 기르세요. 때를 기다리는 것이 지혜입니다.' },
+  { symbol:'䷂', name:'준괘 (屯卦)', num:'제3괘', keyword:'싹틈 · 어려움', meaning:'시작은 어렵지만 포기하지 마세요. 싹은 반드시 틉니다.' },
+  { symbol:'䷃', name:'몽괘 (蒙卦)', num:'제4괘', keyword:'어림 · 배움', meaning:'모르는 것을 인정하고 배우는 자세가 필요합니다.' },
+  { symbol:'䷄', name:'수괘 (需卦)', num:'제5괘', keyword:'기다림 · 믿음', meaning:'서두르지 마세요. 때가 오면 반드시 기회가 찾아옵니다.' },
+  { symbol:'䷅', name:'송괘 (訟卦)', num:'제6괘', keyword:'다툼 · 조심', meaning:'불필요한 갈등을 피하세요. 타협이 최선입니다.' },
+  { symbol:'䷆', name:'사괘 (師卦)', num:'제7괘', keyword:'군중 · 리더십', meaning:'사람들을 이끄는 자리에 서게 될 수 있습니다. 책임감을 가지세요.' },
+  { symbol:'䷇', name:'비괘 (比卦)', num:'제8괘', keyword:'친밀 · 협력', meaning:'혼자보다 함께할 때 더 큰 힘이 납니다.' },
+  { symbol:'䷈', name:'소축괘 (小畜卦)', num:'제9괘', keyword:'작은 저축 · 준비', meaning:'작은 것부터 차근차근 쌓아가세요.' },
+  { symbol:'䷉', name:'리괘 (履卦)', num:'제10괘', keyword:'밟음 · 조심', meaning:'위험한 상황이지만 조심스럽게 나아가면 됩니다.' },
+  { symbol:'䷊', name:'태괘 (泰卦)', num:'제11괘', keyword:'평화 · 번영', meaning:'하늘과 땅이 통하는 길한 날입니다. 적극적으로 움직이세요.' },
+  { symbol:'䷋', name:'비괘 (否卦)', num:'제12괘', keyword:'막힘 · 인내', meaning:'지금은 막혀있지만 반드시 뚫립니다. 인내하세요.' },
+  { symbol:'䷌', name:'동인괘 (同人卦)', num:'제13괘', keyword:'화합 · 공동체', meaning:'뜻이 맞는 사람들과 함께하면 무엇이든 이룰 수 있습니다.' },
+  { symbol:'䷍', name:'대유괘 (大有卦)', num:'제14괘', keyword:'큰 소유 · 풍요', meaning:'풍요로운 기운이 가득합니다. 나눌 줄 아는 지혜가 필요합니다.' },
+  { symbol:'䷎', name:'겸괘 (謙卦)', num:'제15괘', keyword:'겸손 · 덕', meaning:'낮은 자세가 오히려 높은 곳으로 이끕니다.' },
+  { symbol:'䷏', name:'예괘 (豫卦)', num:'제16괘', keyword:'즐거움 · 준비', meaning:'기쁜 일이 찾아올 징조입니다. 미리 준비하세요.' },
+  { symbol:'䷐', name:'수괘 (隨卦)', num:'제17괘', keyword:'따름 · 유연', meaning:'흐름에 따르는 유연함이 오늘의 전략입니다.' },
+  { symbol:'䷑', name:'고괘 (蠱卦)', num:'제18괘', keyword:'바로잡음 · 개혁', meaning:'오래된 문제를 해결할 때입니다. 용기를 내세요.' },
+  { symbol:'䷒', name:'임괘 (臨卦)', num:'제19괘', keyword:'다가옴 · 성장', meaning:'좋은 기운이 점점 커지고 있습니다.' },
+  { symbol:'䷓', name:'관괘 (觀卦)', num:'제20괘', keyword:'관찰 · 성찰', meaning:'먼저 보고 판단하세요. 관찰이 답을 줍니다.' },
+  { symbol:'䷔', name:'서합괘 (噬嗑卦)', num:'제21괘', keyword:'씹음 · 결단', meaning:'걸림돌을 과감히 제거할 때입니다.' },
+  { symbol:'䷕', name:'비괘 (賁卦)', num:'제22괘', keyword:'꾸밈 · 아름다움', meaning:'외면보다 내면을 가꾸는 것이 중요합니다.' },
+  { symbol:'䷖', name:'박괘 (剝卦)', num:'제23괘', keyword:'벗겨짐 · 소멸', meaning:'낡은 것이 떨어져 나가야 새것이 옵니다.' },
+  { symbol:'䷗', name:'복괘 (復卦)', num:'제24괘', keyword:'돌아옴 · 회복', meaning:'잃었던 것이 돌아오는 시기입니다.' },
+  { symbol:'䷘', name:'무망괘 (無妄卦)', num:'제25괘', keyword:'순수 · 자연', meaning:'꾸밈없이 자연스럽게 행동하면 좋은 결과가 옵니다.' },
+  { symbol:'䷙', name:'대축괘 (大畜卦)', num:'제26괘', keyword:'큰 저축 · 축적', meaning:'지금은 힘을 축적할 때입니다. 때를 기다리세요.' },
+  { symbol:'䷚', name:'이괘 (頤卦)', num:'제27괘', keyword:'기름 · 양육', meaning:'몸과 마음을 잘 돌보세요. 건강이 우선입니다.' },
+  { symbol:'䷛', name:'대과괘 (大過卦)', num:'제28괘', keyword:'큰 지남침 · 위기', meaning:'지금은 중심을 잡는 것이 중요합니다.' },
+  { symbol:'䷜', name:'감괘 (坎卦)', num:'제29괘', keyword:'물 · 위험', meaning:'험난한 상황이지만 꾸준히 나아가면 반드시 길이 열립니다.' },
+  { symbol:'䷝', name:'리괘 (離卦)', num:'제30괘', keyword:'불 · 밝음', meaning:'밝고 활발한 기운입니다. 사람들과 교류하면 좋습니다.' },
+  { symbol:'䷞', name:'함괘 (咸卦)', num:'제31괘', keyword:'감응 · 교감', meaning:'마음과 마음이 통하는 날입니다. 솔직하게 표현하세요.' },
+  { symbol:'䷟', name:'항괘 (恒卦)', num:'제32괘', keyword:'항상 · 지속', meaning:'꾸준함이 결국 이깁니다. 포기하지 마세요.' },
+  { symbol:'䷠', name:'둔괘 (遯卦)', num:'제33괘', keyword:'물러남 · 은퇴', meaning:'때로는 물러서는 것이 더 큰 용기입니다.' },
+  { symbol:'䷡', name:'대장괘 (大壯卦)', num:'제34괘', keyword:'큰 힘 · 강성', meaning:'강한 기운이 넘치지만 절제가 필요합니다.' },
+  { symbol:'䷢', name:'진괘 (晉卦)', num:'제35괘', keyword:'나아감 · 진보', meaning:'앞으로 나아갈 좋은 때입니다. 망설이지 마세요.' },
+  { symbol:'䷣', name:'명이괘 (明夷卦)', num:'제36괘', keyword:'빛이 상함 · 인내', meaning:'어두운 시기지만 내면의 빛을 지키세요.' },
+  { symbol:'䷤', name:'가인괘 (家人卦)', num:'제37괘', keyword:'가족 · 질서', meaning:'가까운 사람들과의 관계를 돌아보세요.' },
+  { symbol:'䷥', name:'규괘 (睽卦)', num:'제38괘', keyword:'어긋남 · 차이', meaning:'서로 다름을 인정하면 오히려 조화가 생깁니다.' },
+  { symbol:'䷦', name:'건괘 (蹇卦)', num:'제39괘', keyword:'어려움 · 도움', meaning:'혼자 해결하려 하지 말고 도움을 구하세요.' },
+  { symbol:'䷧', name:'해괘 (解卦)', num:'제40괘', keyword:'풀림 · 해방', meaning:'오랫동안 막혔던 것이 드디어 풀립니다.' },
+  { symbol:'䷨', name:'손괘 (損卦)', num:'제41괘', keyword:'덜어냄 · 희생', meaning:'지금 덜어내는 것이 나중에 더 큰 것을 가져옵니다.' },
+  { symbol:'䷩', name:'익괘 (益卦)', num:'제42괘', keyword:'더함 · 이익', meaning:'지금 투자하고 노력하면 반드시 이익이 돌아옵니다.' },
+  { symbol:'䷪', name:'쾌괘 (夬卦)', num:'제43괘', keyword:'결단 · 돌파', meaning:'과감한 결단이 필요한 시점입니다.' },
+  { symbol:'䷫', name:'구괘 (姤卦)', num:'제44괘', keyword:'만남 · 우연', meaning:'뜻밖의 만남이 중요한 인연이 될 수 있습니다.' },
+  { symbol:'䷬', name:'췌괘 (萃卦)', num:'제45괘', keyword:'모임 · 집합', meaning:'사람들이 모이는 곳에서 기회가 생깁니다.' },
+  { symbol:'䷭', name:'승괘 (升卦)', num:'제46괘', keyword:'오름 · 상승', meaning:'꾸준히 올라가고 있습니다. 멈추지 마세요.' },
+  { symbol:'䷮', name:'곤괘 (困卦)', num:'제47괘', keyword:'곤란 · 역경', meaning:'지금의 어려움은 반드시 끝납니다. 버티세요.' },
+  { symbol:'䷯', name:'정괘 (井卦)', num:'제48괘', keyword:'우물 · 근원', meaning:'본질로 돌아가세요. 기본이 가장 강합니다.' },
+  { symbol:'䷰', name:'혁괘 (革卦)', num:'제49괘', keyword:'변혁 · 변화', meaning:'과감한 변화를 두려워하지 마세요. 혁신의 때입니다.' },
+  { symbol:'䷱', name:'정괘 (鼎卦)', num:'제50괘', keyword:'솥 · 변환', meaning:'새로운 것을 만들어내는 창조의 기운입니다.' },
+  { symbol:'䷲', name:'진괘 (震卦)', num:'제51괘', keyword:'번개 · 충격', meaning:'갑작스러운 변화가 찾아올 수 있습니다. 흔들리지 마세요.' },
+  { symbol:'䷳', name:'간괘 (艮卦)', num:'제52괘', keyword:'산 · 멈춤', meaning:'지금은 멈추고 내면을 들여다볼 때입니다.' },
+  { symbol:'䷴', name:'점괘 (漸卦)', num:'제53괘', keyword:'점진 · 순서', meaning:'서두르지 말고 단계적으로 나아가세요.' },
+  { symbol:'䷵', name:'귀매괘 (歸妹卦)', num:'제54괘', keyword:'귀가 · 관계', meaning:'인연과 관계에 집중할 때입니다.' },
+  { symbol:'䷶', name:'풍괘 (豐卦)', num:'제55괘', keyword:'풍성 · 절정', meaning:'풍성함의 절정에 있습니다. 나눌 줄 아세요.' },
+  { symbol:'䷷', name:'려괘 (旅卦)', num:'제56괘', keyword:'나그네 · 여행', meaning:'변화와 이동의 기운입니다. 유연하게 대처하세요.' },
+  { symbol:'䷸', name:'손괘 (巽卦)', num:'제57괘', keyword:'바람 · 부드러움', meaning:'부드럽게 스며드는 전략이 통하는 날입니다.' },
+  { symbol:'䷹', name:'태괘 (兌卦)', num:'제58괘', keyword:'연못 · 기쁨', meaning:'기쁜 소식이 찾아올 징조입니다. 마음을 열어두세요.' },
+  { symbol:'䷺', name:'환괘 (渙卦)', num:'제59괘', keyword:'흩어짐 · 해소', meaning:'막혔던 것이 흩어지며 해소됩니다.' },
+  { symbol:'䷻', name:'절괘 (節卦)', num:'제60괘', keyword:'절제 · 한계', meaning:'적절한 절제가 오히려 더 큰 힘을 만듭니다.' },
+  { symbol:'䷼', name:'중부괘 (中孚卦)', num:'제61괘', keyword:'믿음 · 진실', meaning:'진심이 통하는 날입니다. 솔직하게 표현하세요.' },
+  { symbol:'䷽', name:'소과괘 (小過卦)', num:'제62괘', keyword:'작은 지남침 · 신중', meaning:'큰 것보다 작은 것에 집중하세요.' },
+  { symbol:'䷾', name:'기제괘 (旣濟卦)', num:'제63괘', keyword:'이미 건넘 · 완성', meaning:'목표에 거의 다 왔습니다. 마지막까지 긴장을 놓지 마세요.' },
+  { symbol:'䷿', name:'미제괘 (未濟卦)', num:'제64괘', keyword:'아직 못 건넘 · 미완', meaning:'아직 끝나지 않았습니다. 포기하지 말고 계속 나아가세요.' },
+];
+
+// =====================
+// 타로 78장 전체
+// 메이저 22장 + 마이너 56장
+// =====================
+const TAROT = [
+  // 메이저 아르카나 22장
+  { symbol:'🌟', name:'광대 (The Fool)', keyword:'새로운 시작', meaning:'두려움 없이 새로운 도전을 시작할 때입니다.' },
+  { symbol:'🎩', name:'마법사 (The Magician)', keyword:'의지 · 능력', meaning:'당신 안에 필요한 모든 것이 있습니다.' },
+  { symbol:'🌙', name:'여사제 (The High Priestess)', keyword:'직관 · 비밀', meaning:'직관을 믿으세요. 아직 드러나지 않은 것이 있습니다.' },
+  { symbol:'🌸', name:'여황제 (The Empress)', keyword:'풍요 · 창조', meaning:'창조적 에너지가 넘치는 날입니다.' },
+  { symbol:'👑', name:'황제 (The Emperor)', keyword:'권위 · 안정', meaning:'체계적이고 계획적으로 움직이면 좋습니다.' },
+  { symbol:'⛪', name:'교황 (The Hierophant)', keyword:'전통 · 지혜', meaning:'검증된 방법과 조언을 따르는 것이 유리합니다.' },
+  { symbol:'💑', name:'연인 (The Lovers)', keyword:'선택 · 관계', meaning:'중요한 선택의 기로에 서 있습니다. 마음을 따르세요.' },
+  { symbol:'🏎️', name:'전차 (The Chariot)', keyword:'승리 · 추진력', meaning:'강한 의지로 밀어붙이면 반드시 성과가 있습니다.' },
+  { symbol:'🦁', name:'힘 (Strength)', keyword:'용기 · 인내', meaning:'내면의 강인함이 오늘의 무기입니다.' },
+  { symbol:'🏮', name:'은둔자 (The Hermit)', keyword:'성찰 · 고독', meaning:'혼자만의 시간이 필요합니다. 내면의 소리를 들어보세요.' },
+  { symbol:'☸️', name:'운명의 수레바퀴 (Wheel of Fortune)', keyword:'변화 · 전환', meaning:'운의 흐름이 바뀌는 시점입니다.' },
+  { symbol:'⚖️', name:'정의 (Justice)', keyword:'균형 · 공정', meaning:'공정하고 균형 잡힌 판단이 필요한 날입니다.' },
+  { symbol:'🙃', name:'매달린 사람 (The Hanged Man)', keyword:'희생 · 관점 전환', meaning:'기존과 다른 시각으로 바라보세요.' },
+  { symbol:'💀', name:'죽음 (Death)', keyword:'변환 · 끝과 시작', meaning:'끝은 새로운 시작입니다. 두려워하지 마세요.' },
+  { symbol:'🏺', name:'절제 (Temperance)', keyword:'조화 · 균형', meaning:'극단을 피하고 중용을 지키세요.' },
+  { symbol:'😈', name:'악마 (The Devil)', keyword:'집착 · 속박', meaning:'무언가에 지나치게 얽매여 있지 않은지 돌아보세요.' },
+  { symbol:'🗼', name:'탑 (The Tower)', keyword:'붕괴 · 해방', meaning:'갑작스러운 변화가 오더라도 결국 더 나아지는 계기가 됩니다.' },
+  { symbol:'✨', name:'별 (The Star)', keyword:'희망 · 치유', meaning:'희망의 빛이 비치고 있습니다. 믿음을 가지세요.' },
+  { symbol:'🌕', name:'달 (The Moon)', keyword:'환상 · 불안', meaning:'보이는 것이 전부가 아닙니다. 직관을 믿되 신중하게.' },
+  { symbol:'☀️', name:'태양 (The Sun)', keyword:'성공 · 활력', meaning:'밝고 긍정적인 에너지가 가득한 날입니다.' },
+  { symbol:'📯', name:'심판 (Judgement)', keyword:'부활 · 전환', meaning:'과거를 돌아보고 새롭게 거듭날 시간입니다.' },
+  { symbol:'🌍', name:'세계 (The World)', keyword:'완성 · 성취', meaning:'하나의 사이클이 완성되는 시점입니다.' },
+
+  // 마이너 아르카나 — 완드 (Wands) 14장 · 불 · 열정
+  { symbol:'🔥', name:'완드 에이스 (Ace of Wands)', keyword:'열정 · 시작', meaning:'새로운 열정이 불타오릅니다. 지금 시작하세요.' },
+  { symbol:'🔥', name:'완드 2 (Two of Wands)', keyword:'계획 · 비전', meaning:'큰 그림을 그리고 있습니다. 과감하게 실행하세요.' },
+  { symbol:'🔥', name:'완드 3 (Three of Wands)', keyword:'확장 · 기다림', meaning:'이미 뿌린 씨앗이 자라고 있습니다. 조금만 기다리세요.' },
+  { symbol:'🔥', name:'완드 4 (Four of Wands)', keyword:'축하 · 안정', meaning:'노력의 결실을 맺는 시간입니다. 축하받을 일이 생깁니다.' },
+  { symbol:'🔥', name:'완드 5 (Five of Wands)', keyword:'경쟁 · 갈등', meaning:'경쟁이 치열하지만 그것이 성장의 원동력입니다.' },
+  { symbol:'🔥', name:'완드 6 (Six of Wands)', keyword:'승리 · 인정', meaning:'노력이 인정받는 날입니다. 당당하게 나서세요.' },
+  { symbol:'🔥', name:'완드 7 (Seven of Wands)', keyword:'방어 · 용기', meaning:'도전에 굴하지 말고 자신의 자리를 지키세요.' },
+  { symbol:'🔥', name:'완드 8 (Eight of Wands)', keyword:'속도 · 진행', meaning:'일이 빠르게 진행됩니다. 흐름을 놓치지 마세요.' },
+  { symbol:'🔥', name:'완드 9 (Nine of Wands)', keyword:'인내 · 회복력', meaning:'거의 다 왔습니다. 마지막 힘을 내세요.' },
+  { symbol:'🔥', name:'완드 10 (Ten of Wands)', keyword:'부담 · 책임', meaning:'너무 많은 짐을 지고 있지 않은지 돌아보세요.' },
+  { symbol:'🔥', name:'완드 시종 (Page of Wands)', keyword:'탐구 · 열의', meaning:'새로운 아이디어에 대한 열의가 넘칩니다.' },
+  { symbol:'🔥', name:'완드 기사 (Knight of Wands)', keyword:'모험 · 충동', meaning:'열정적으로 행동하되 충동을 조심하세요.' },
+  { symbol:'🔥', name:'완드 여왕 (Queen of Wands)', keyword:'카리스마 · 자신감', meaning:'당당하고 카리스마 있게 행동할 때입니다.' },
+  { symbol:'🔥', name:'완드 왕 (King of Wands)', keyword:'리더십 · 비전', meaning:'큰 그림을 보고 사람들을 이끌 때입니다.' },
+
+  // 마이너 아르카나 — 컵 (Cups) 14장 · 물 · 감정
+  { symbol:'💧', name:'컵 에이스 (Ace of Cups)', keyword:'사랑 · 새 감정', meaning:'새로운 감정이 시작됩니다. 마음을 열어두세요.' },
+  { symbol:'💧', name:'컵 2 (Two of Cups)', keyword:'연결 · 파트너십', meaning:'특별한 인연이 깊어지는 날입니다.' },
+  { symbol:'💧', name:'컵 3 (Three of Cups)', keyword:'축하 · 우정', meaning:'소중한 사람들과 함께하는 기쁨이 있습니다.' },
+  { symbol:'💧', name:'컵 4 (Four of Cups)', keyword:'권태 · 성찰', meaning:'주변에 있는 좋은 것들을 놓치고 있지는 않나요?' },
+  { symbol:'💧', name:'컵 5 (Five of Cups)', keyword:'상실 · 후회', meaning:'잃은 것보다 남은 것에 집중하세요.' },
+  { symbol:'💧', name:'컵 6 (Six of Cups)', keyword:'추억 · 향수', meaning:'과거의 좋은 기억이 위안을 줍니다.' },
+  { symbol:'💧', name:'컵 7 (Seven of Cups)', keyword:'환상 · 선택', meaning:'너무 많은 선택지에 혼란스러울 수 있습니다. 현실에 집중하세요.' },
+  { symbol:'💧', name:'컵 8 (Eight of Cups)', keyword:'떠남 · 탐색', meaning:'더 나은 것을 찾아 떠날 용기가 필요합니다.' },
+  { symbol:'💧', name:'컵 9 (Nine of Cups)', keyword:'소원성취 · 만족', meaning:'바라던 것이 이루어집니다. 감사한 마음을 가지세요.' },
+  { symbol:'💧', name:'컵 10 (Ten of Cups)', keyword:'행복 · 완성', meaning:'진정한 행복과 만족이 찾아오는 날입니다.' },
+  { symbol:'💧', name:'컵 시종 (Page of Cups)', keyword:'감수성 · 메시지', meaning:'감성적인 메시지나 소식이 올 수 있습니다.' },
+  { symbol:'💧', name:'컵 기사 (Knight of Cups)', keyword:'낭만 · 이상주의', meaning:'감정에 솔직하게 행동할 때입니다.' },
+  { symbol:'💧', name:'컵 여왕 (Queen of Cups)', keyword:'공감 · 직관', meaning:'감성과 직관으로 주변을 보듬어주세요.' },
+  { symbol:'💧', name:'컵 왕 (King of Cups)', keyword:'감정적 성숙 · 지혜', meaning:'감정을 지혜롭게 다스리는 것이 오늘의 과제입니다.' },
+
+  // 마이너 아르카나 — 소드 (Swords) 14장 · 바람 · 사고
+  { symbol:'⚔️', name:'소드 에이스 (Ace of Swords)', keyword:'진실 · 명확함', meaning:'명확한 진실이 드러날 때입니다.' },
+  { symbol:'⚔️', name:'소드 2 (Two of Swords)', keyword:'결정 장애 · 균형', meaning:'어려운 결정 앞에 서 있습니다. 직관을 믿으세요.' },
+  { symbol:'⚔️', name:'소드 3 (Three of Swords)', keyword:'슬픔 · 상처', meaning:'아픔이 있지만 그것이 성장의 밑거름이 됩니다.' },
+  { symbol:'⚔️', name:'소드 4 (Four of Swords)', keyword:'휴식 · 회복', meaning:'지금은 쉬어야 할 때입니다. 충전하세요.' },
+  { symbol:'⚔️', name:'소드 5 (Five of Swords)', keyword:'갈등 · 패배', meaning:'이기는 것보다 관계가 더 중요할 수 있습니다.' },
+  { symbol:'⚔️', name:'소드 6 (Six of Swords)', keyword:'전환 · 이동', meaning:'어려운 상황에서 벗어나고 있습니다.' },
+  { symbol:'⚔️', name:'소드 7 (Seven of Swords)', keyword:'전략 · 기만', meaning:'영리하게 행동하되 정직함을 잃지 마세요.' },
+  { symbol:'⚔️', name:'소드 8 (Eight of Swords)', keyword:'속박 · 제한', meaning:'스스로 만든 한계에서 벗어나세요.' },
+  { symbol:'⚔️', name:'소드 9 (Nine of Swords)', keyword:'불안 · 걱정', meaning:'걱정이 현실보다 크게 느껴지고 있습니다. 호흡하세요.' },
+  { symbol:'⚔️', name:'소드 10 (Ten of Swords)', keyword:'끝 · 배신', meaning:'최악의 순간이 지나가고 있습니다. 이제 올라갈 일만 남았습니다.' },
+  { symbol:'⚔️', name:'소드 시종 (Page of Swords)', keyword:'호기심 · 경계', meaning:'정보를 수집하고 분석할 때입니다.' },
+  { symbol:'⚔️', name:'소드 기사 (Knight of Swords)', keyword:'행동 · 직접', meaning:'과감하고 직접적으로 행동하세요.' },
+  { symbol:'⚔️', name:'소드 여왕 (Queen of Swords)', keyword:'독립 · 명철', meaning:'냉철하고 명확하게 판단할 때입니다.' },
+  { symbol:'⚔️', name:'소드 왕 (King of Swords)', keyword:'권위 · 논리', meaning:'논리와 원칙으로 상황을 이끌어가세요.' },
+
+  // 마이너 아르카나 — 펜타클 (Pentacles) 14장 · 흙 · 물질
+  { symbol:'💰', name:'펜타클 에이스 (Ace of Pentacles)', keyword:'기회 · 물질적 시작', meaning:'새로운 재물의 기회가 열립니다.' },
+  { symbol:'💰', name:'펜타클 2 (Two of Pentacles)', keyword:'균형 · 적응', meaning:'여러 가지를 동시에 조율해야 하는 날입니다.' },
+  { symbol:'💰', name:'펜타클 3 (Three of Pentacles)', keyword:'협력 · 기술', meaning:'팀워크와 전문성이 빛을 발합니다.' },
+  { symbol:'💰', name:'펜타클 4 (Four of Pentacles)', keyword:'안정 · 집착', meaning:'안정을 추구하되 지나친 집착은 금물입니다.' },
+  { symbol:'💰', name:'펜타클 5 (Five of Pentacles)', keyword:'결핍 · 어려움', meaning:'어렵지만 도움을 요청할 용기가 필요합니다.' },
+  { symbol:'💰', name:'펜타클 6 (Six of Pentacles)', keyword:'나눔 · 관대함', meaning:'나눌수록 더 많이 돌아옵니다.' },
+  { symbol:'💰', name:'펜타클 7 (Seven of Pentacles)', keyword:'인내 · 평가', meaning:'노력의 결과를 점검하고 다음을 준비하세요.' },
+  { symbol:'💰', name:'펜타클 8 (Eight of Pentacles)', keyword:'숙련 · 노력', meaning:'꾸준한 노력이 전문가를 만듭니다.' },
+  { symbol:'💰', name:'펜타클 9 (Nine of Pentacles)', keyword:'풍요 · 독립', meaning:'스스로의 노력으로 풍요를 이루고 있습니다.' },
+  { symbol:'💰', name:'펜타클 10 (Ten of Pentacles)', keyword:'유산 · 완성', meaning:'오랫동안 쌓아온 것이 결실을 맺습니다.' },
+  { symbol:'💰', name:'펜타클 시종 (Page of Pentacles)', keyword:'학습 · 기회', meaning:'새로운 기술이나 지식을 배울 기회가 옵니다.' },
+  { symbol:'💰', name:'펜타클 기사 (Knight of Pentacles)', keyword:'성실 · 책임감', meaning:'꾸준하고 성실하게 나아가면 반드시 결과가 옵니다.' },
+  { symbol:'💰', name:'펜타클 여왕 (Queen of Pentacles)', keyword:'실용 · 돌봄', meaning:'현실적이고 따뜻하게 주변을 돌보세요.' },
+  { symbol:'💰', name:'펜타클 왕 (King of Pentacles)', keyword:'성공 · 안정', meaning:'물질적 성공과 안정이 가까이 있습니다.' },
+];
+
+// =====================
+// 오행별 점심 추천
+// =====================
+const FOODS = {
+  목: [
+    { name:'나물비빔밥', reason:'목(木) 기운 보충. 신선한 채소로 생기를 더하세요.' },
+    { name:'된장찌개 + 보리밥', reason:'안정적인 목(木) 에너지. 판단력 회복에 도움.' },
+    { name:'샐러드 + 두부', reason:'가볍고 청명한 기운. 오후 집중력 유지.' },
+  ],
+  화: [
+    { name:'닭볶음탕', reason:'화(火) 기운 활성화. 활력과 열정을 더합니다.' },
+    { name:'매운 떡볶이', reason:'화(火) 에너지 자극. 오전 무기력함 해소.' },
+    { name:'삼겹살 + 쌈', reason:'강한 화(火) 기운. 오후 추진력에 도움.' },
+  ],
+  토: [
+    { name:'황태국 + 흰쌀밥', reason:'토(土) 기운 안정. 중심을 잡아주는 식사.' },
+    { name:'순두부찌개', reason:'부드럽고 따뜻한 토(土) 에너지.' },
+    { name:'감자탕', reason:'토(土) 기운 보충. 체력 회복에 효과적.' },
+  ],
+  금: [
+    { name:'갈비탕', reason:'금(金) 기운 강화. 결단력과 명확함을 더합니다.' },
+    { name:'삼계탕', reason:'강한 금(金) 에너지. 오늘의 결정을 도와줍니다.' },
+    { name:'육회비빔밥', reason:'예리한 금(金) 기운. 집중력 극대화.' },
+  ],
+  수: [
+    { name:'미역국 + 현미밥', reason:'수(水) 기운 보충. 지혜와 유연함을 더합니다.' },
+    { name:'콩나물국밥', reason:'수(Water) 에너지 활성화. 머리를 맑게 합니다.' },
+    { name:'냉면', reason:'시원한 수(水) 기운. 복잡한 생각 정리에 좋습니다.' },
+  ],
+};
+
+const 오행목록 = ['목','화','토','금','수'];
