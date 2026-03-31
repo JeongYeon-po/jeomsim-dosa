@@ -643,6 +643,10 @@ const query = new URLSearchParams({
   year: formData.year,
   gender: formData.gender,
   trust: formData.trustLevel,
+  hour: formData.hour,      
+  calType: formData.calType,
+  month: formData.month,
+  day: formData.day,
 }).toString();
 location.href = `result.html?${query}`;
     }
