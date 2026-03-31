@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>점(占)심(心)도사 — 오늘의 운세</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: #0d0d0d;
+      color: #f5f0e8;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .result-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* 상단 헤더 */
+    .result-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .result-badge {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #a0845c;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .result-name {
+      font-size: 22px;
+      font-weight: 300;
+      color: #f5f0e8;
+      margin-bottom: 4px;
+    }
+
+    .result-name span { color: #c9a96e; }
+
+    .result-meta {
+      font-size: 12px;
+      color: #444;
+      letter-spacing: 1px;
+    }
+
+    /* 신뢰도 모드 뱃지 */
+    .mode-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 4px 12px;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      color: #a0845c;
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* 카드 공통 */
+    .result-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: #a0845c;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #f5f0e8;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .card-body {
+      font-size: 14px;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    /* 오늘의 한마디 (메인 팩폭) */
+    .main-verdict {
+      background: #111;
+      border: 1px solid #c9a96e33;
+      border-radius: 8px;
+      padding: 28px 24px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .verdict-quote {
+      font-size: 17px;
+      font-weight: 400;
+      color: #d4b896;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .verdict-sign {
+      font-size: 11px;
+      color: #444;
+      letter-spacing: 2px;
+    }
+
+    /* 점수 바 */
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: #666;
+      width: 36px;
+      flex-shrink: 0;
+    }
+
+    .score-bar-wrap {
+      flex: 1;
+      background: #1a1a1a;
+      border-radius: 2px;
+      height: 4px;
+      overflow: hidden;
+    }
+
+    .score-bar {
+      height: 100%;
+      background: #c9a96e;
+      border-radius: 2px;
+      transition: width 1s ease;
+    }
+
+    .score-num {
+      font-size: 12px;
+      color: #a0845c;
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* 점심 추천 카드 */
+    .food-card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .food-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .food-item:last-child { border-bottom: none; }
+
+    .food-rank {
+      font-size: 11px;
+      color: #a0845c;
+      width: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .food-info { flex: 1; }
+
+    .food-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #f5f0e8;
+      margin-bottom: 3px;
+    }
+
+    .food-reason {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    /* 다시하기 버튼 */
+    .retry-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      border: 1px solid #2a2a2a;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 10px;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+
+    .retry-btn:hover {
+      border-color: #a0845c;
+      color: #a0845c;
+    }
+
+    /* 로딩 화면 */
+    #loadingScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: #a0845c;
+      letter-spacing: 2px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .loading-sub {
+      font-size: 12px;
+      color: #333;
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* 결과 화면 (처음엔 숨김) */
+    #resultScreen { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- 로딩 화면 -->
+  <div id="loadingScreen">
+    <div class="loading-text">도사가 천기를 읽는 중...</div>
+    <div class="loading-sub">잠시만 기다려주세요</div>
+  </div>
+
+  <!-- 결과 화면 -->
+  <div id="resultScreen">
+    <div class="result-wrap">
+
+      <!-- 헤더 -->
+      <div class="result-header">
+        <div class="result-badge">오늘의 점(占)심(心)</div>
+        <div class="result-name" id="resultName">홍길동<span>님</span></div>
+        <div class="result-meta" id="resultMeta">INTJ · 1990년생 · 남성</div>
+        <div class="mode-badge" id="modeBadge">⚖️ 밸런스 모드</div>
+      </div>
+
+      <!-- 오늘의 한마디 (메인 팩폭) -->
+      <div class="main-verdict">
+        <div class="verdict-quote" id="verdictQuote">
+          "오늘은 결정을 미루는 게 오히려 득이 되는 날.<br>
+          머릿속이 복잡하다면, 그건 신호다."
+        </div>
+        <div class="verdict-sign">— 점심도사 왈</div>
+      </div>
+
+      <!-- 오늘의 운세 점수 -->
+      <div class="result-card">
+        <div class="card-label">오늘의 운세 점수</div>
+        <div class="score-row">
+          <div class="score-label">전체</div>
+          <div class="score-bar-wrap"><div class="score-bar" id="bar-overall" style="width:0%"></div></div>
+          <div class="score-num" id="num-overall">0</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">재물</div>
+          <div class="score-bar-wrap"><div class="score-bar" id="bar-money" style="width:0%"></div></div>
+          <div class="score-num" id="num-money">0</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">연애</div>
+          <div class="score-bar-wrap"><div class="score-bar" id="bar-love" style="width:0%"></div></div>
+          <div class="score-num" id="num-love">0</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">건강</div>
+          <div class="score-bar-wrap"><div class="score-bar" id="bar-health" style="width:0%"></div></div>
+          <div class="score-num" id="num-health">0</div>
+        </div>
+      </div>
+
+      <!-- 도사의 팩폭 -->
+      <div class="result-card">
+        <div class="card-label">도사의 한마디</div>
+        <div class="card-title" id="pakpokTitle">오늘 당신의 판단을 믿지 마세요</div>
+        <div class="card-body" id="pakpokBody">
+          INTJ 특유의 과신이 오늘따라 독이 됩니다.
+          수(水) 기운이 강한 날, 감정보다 데이터를 믿으세요.
+          중요한 결정은 내일로 미루는 게 통계적으로 유리합니다.
+        </div>
+      </div>
+
+      <!-- 점심 추천 -->
+      <div class="food-card">
+        <div class="card-label">오늘의 점심 추천</div>
+        <div id="foodList">
+          <div class="food-item">
+            <div class="food-rank">01</div>
+            <div class="food-info">
+              <div class="food-name">미역국 + 현미밥</div>
+              <div class="food-reason">수(水) 기운 보충. 오늘 부족한 집중력을 음식으로 채우세요.</div>
+            </div>
+          </div>
+          <div class="food-item">
+            <div class="food-rank">02</div>
+            <div class="food-info">
+              <div class="food-name">두부김치</div>
+              <div class="food-reason">목(木) 기운 활성화. 판단력 회복에 도움이 되는 조합입니다.</div>
+            </div>
+          </div>
+          <div class="food-item">
+            <div class="food-rank">03</div>
+            <div class="food-info">
+              <div class="food-name">아메리카노 (뜨거운 것)</div>
+              <div class="food-reason">화(火) 기운 자극. 오전 기운이 처질 때 각성 효과.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 다시하기 -->
+      <button class="retry-btn" onclick="location.href='index.html'">
+        ← 처음으로 돌아가기
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    // URL 파라미터에서 데이터 받아오기
+    // index.html에서 submitForm() 할 때 이 페이지로 데이터 넘겨줌
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name') || '도사';
+    const mbti = params.get('mbti') || 'INTJ';
+    const year = params.get('year') || '1990';
+    const gender = params.get('gender') === 'male' ? '남성' : '여성';
+    const trust = parseInt(params.get('trust') || '2');
+
+    // 신뢰도에 따른 모드 텍스트
+    const modeTexts = [
+      '🔬 완전 과학 모드',
+      '📊 데이터 우선 모드',
+      '⚖️ 밸런스 모드',
+      '🌙 운세 참고 모드',
+      '🔮 신비 모드',
+      '🌟 완전 신비 모드',
+    ];
+
+    // 신뢰도(0~5)에 따라 다른 팩폭 문구
+    // 0 = 과학적, 5 = 신비로운 톤
+    const verdicts = [
+      // trust 0 — 완전 과학
+      `"${mbti} 유형은 오늘 인지 부하가 높은 상태입니다.<br>의사결정을 최소화하고 루틴에 집중하세요."`,
+      // trust 1
+      `"데이터상 오늘은 새로운 시도보다 검증된 방식이 유리합니다.<br>사주 패턴도 같은 방향을 가리키고 있어요."`,
+      // trust 2 — 밸런스
+      `"오늘은 결정을 미루는 게 오히려 득이 되는 날.<br>머릿속이 복잡하다면, 그건 신호입니다."`,
+      // trust 3
+      `"사주의 흐름상 오늘은 밀기보다 기다리는 날.<br>${mbti}의 직관을 믿되, 서두르지 마세요."`,
+      // trust 4
+      `"오늘 천간의 기운이 당신의 결정을 흔들고 있습니다.<br>고요히 기다리면 길이 보일 것입니다."`,
+      // trust 5 — 완전 신비
+      `"오늘의 기운은 물처럼 조용히 흐릅니다.<br>억지로 막으려 하지 말고, 흐름에 몸을 맡기십시오."`,
+    ];
+
+    // 오늘 날짜 기반으로 점수 생성
+    // (나중에 실제 사주 계산으로 교체 예정)
+    function getDailyScore(seed) {
+      // 날짜 + 이름으로 시드 만들어서 매일 다른 점수
+      const today = new Date().toDateString();
+      let hash = 0;
+      for (let c of (today + seed)) hash = (hash * 31 + c.charCodeAt(0)) % 100;
+      return Math.max(30, Math.min(95, hash));
+    }
+
+    // 점수 바 애니메이션
+    function animateBar(id, numId, score) {
+      setTimeout(() => {
+        document.getElementById(id).style.width = score + '%';
+        document.getElementById(numId).textContent = score;
+      }, 300);
+    }
+
+    // 로딩 화면 → 결과 화면 전환 (1.5초 후)
+    setTimeout(() => {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'block';
+
+      // 텍스트 채우기
+      document.getElementById('resultName').innerHTML = `${name}<span>님</span>`;
+      document.getElementById('resultMeta').textContent = `${mbti} · ${year}년생 · ${gender}`;
+      document.getElementById('modeBadge').textContent = modeTexts[trust];
+      document.getElementById('verdictQuote').innerHTML = verdicts[trust];
+
+      // 점수 애니메이션
+      animateBar('bar-overall', 'num-overall', getDailyScore(name + 'overall'));
+      animateBar('bar-money',   'num-money',   getDailyScore(name + 'money'));
+      animateBar('bar-love',    'num-love',    getDailyScore(name + 'love'));
+      animateBar('bar-health',  'num-health',  getDailyScore(name + 'health'));
+
+    }, 1500);
+  </script>
+
+</body>
+</html>
