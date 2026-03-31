@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>점(占)심(心)도사 — 오늘의 운세</title>
+  <script src="data.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
       background: #0d0d0d;
@@ -14,417 +14,329 @@
       min-height: 100vh;
       padding: 20px;
     }
+    .wrap { max-width: 480px; margin: 0 auto; padding: 40px 20px 80px; }
 
-    .result-wrap {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 40px 20px 80px;
-    }
+    /* 헤더 */
+    .header { text-align: center; margin-bottom: 40px; }
+    .badge { font-size: 11px; letter-spacing: 3px; color: #a0845c; text-transform: uppercase; margin-bottom: 10px; }
+    .user-name { font-size: 24px; font-weight: 300; margin-bottom: 4px; }
+    .user-name span { color: #c9a96e; }
+    .user-meta { font-size: 12px; color: #444; letter-spacing: 1px; }
+    .mode-badge { display: inline-block; font-size: 11px; padding: 4px 12px; border: 1px solid #2a2a2a; border-radius: 20px; color: #a0845c; margin-top: 10px; }
 
-    /* 상단 헤더 */
-    .result-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+    /* 메인 팩폭 */
+    .verdict-card { background: #111; border: 1px solid #c9a96e33; border-radius: 8px; padding: 28px 24px; margin-bottom: 16px; text-align: center; }
+    .verdict-text { font-size: 16px; color: #d4b896; line-height: 1.9; margin-bottom: 14px; }
+    .verdict-sign { font-size: 11px; color: #333; letter-spacing: 2px; }
 
-    .result-badge {
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: #a0845c;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .result-name {
-      font-size: 22px;
-      font-weight: 300;
-      color: #f5f0e8;
-      margin-bottom: 4px;
-    }
-
-    .result-name span { color: #c9a96e; }
-
-    .result-meta {
-      font-size: 12px;
-      color: #444;
-      letter-spacing: 1px;
-    }
-
-    /* 신뢰도 모드 뱃지 */
-    .mode-badge {
-      display: inline-block;
-      font-size: 11px;
-      padding: 4px 12px;
-      border: 1px solid #2a2a2a;
-      border-radius: 20px;
-      color: #a0845c;
-      margin-top: 10px;
-      letter-spacing: 1px;
-    }
-
-    /* 카드 공통 */
-    .result-card {
-      background: #111;
-      border: 1px solid #1e1e1e;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-
-    .card-label {
-      font-size: 10px;
-      letter-spacing: 2px;
-      color: #a0845c;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .card-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: #f5f0e8;
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-
-    .card-body {
-      font-size: 14px;
-      color: #888;
-      line-height: 1.8;
-    }
-
-    /* 오늘의 한마디 (메인 팩폭) */
-    .main-verdict {
-      background: #111;
-      border: 1px solid #c9a96e33;
-      border-radius: 8px;
-      padding: 28px 24px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .verdict-quote {
-      font-size: 17px;
-      font-weight: 400;
-      color: #d4b896;
-      line-height: 1.8;
-      margin-bottom: 16px;
-    }
-
-    .verdict-sign {
-      font-size: 11px;
-      color: #444;
-      letter-spacing: 2px;
-    }
+    /* 공통 카드 */
+    .card { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 22px; margin-bottom: 14px; }
+    .card-label { font-size: 10px; letter-spacing: 2px; color: #a0845c; text-transform: uppercase; margin-bottom: 14px; }
 
     /* 점수 바 */
-    .score-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
+    .score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+    .score-label { font-size: 12px; color: #555; width: 36px; flex-shrink: 0; }
+    .score-bar-bg { flex: 1; background: #1a1a1a; border-radius: 2px; height: 3px; }
+    .score-bar { height: 100%; background: #c9a96e; border-radius: 2px; width: 0%; transition: width 1.2s ease; }
+    .score-num { font-size: 12px; color: #a0845c; width: 28px; text-align: right; }
 
-    .score-label {
-      font-size: 12px;
-      color: #666;
-      width: 36px;
-      flex-shrink: 0;
-    }
+    /* 점괘 */
+    .gua-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .gua-symbol { font-size: 40px; line-height: 1; flex-shrink: 0; }
+    .gua-name { font-size: 15px; font-weight: 500; color: #c9a96e; margin-bottom: 3px; }
+    .gua-keyword { font-size: 11px; color: #555; letter-spacing: 1px; }
+    .gua-meaning { font-size: 13px; color: #666; line-height: 1.7; }
 
-    .score-bar-wrap {
-      flex: 1;
-      background: #1a1a1a;
-      border-radius: 2px;
-      height: 4px;
-      overflow: hidden;
-    }
+    /* 타로 */
+    .tarot-item { padding: 14px 0; border-bottom: 1px solid #1a1a1a; }
+    .tarot-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .tarot-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .tarot-symbol { width: 40px; height: 40px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .tarot-name { font-size: 13px; font-weight: 500; color: #f5f0e8; margin-bottom: 2px; }
+    .tarot-sub { font-size: 11px; color: #444; }
+    .tarot-meaning { font-size: 12px; color: #666; line-height: 1.7; }
 
-    .score-bar {
-      height: 100%;
-      background: #c9a96e;
-      border-radius: 2px;
-      transition: width 1s ease;
-    }
+    /* 결핍 배너 */
+    .missing-banner { background: #140f05; border: 1px solid #c9a96e55; border-radius: 8px; padding: 20px 22px; margin-bottom: 14px; }
+    .missing-title { font-size: 13px; color: #c9a96e; font-weight: 500; margin-bottom: 8px; }
+    .missing-desc { font-size: 12px; color: #555; line-height: 1.7; margin-bottom: 14px; }
+    .missing-btn { width: 100%; padding: 12px; background: #c9a96e; color: #0d0d0d; border: none; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 1px; transition: background 0.2s; }
+    .missing-btn:hover { background: #b8956a; }
 
-    .score-num {
-      font-size: 12px;
-      color: #a0845c;
-      width: 30px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    /* 점심 추천 카드 */
-    .food-card {
-      background: #111;
-      border: 1px solid #1e1e1e;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-
-    .food-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 12px 0;
-      border-bottom: 1px solid #1a1a1a;
-    }
-
+    /* 음식 */
+    .food-item { display: flex; gap: 14px; padding: 11px 0; border-bottom: 1px solid #1a1a1a; }
     .food-item:last-child { border-bottom: none; }
+    .food-rank { font-size: 11px; color: #a0845c; width: 18px; flex-shrink: 0; padding-top: 2px; }
+    .food-name { font-size: 14px; font-weight: 500; color: #f5f0e8; margin-bottom: 3px; }
+    .food-reason { font-size: 12px; color: #555; line-height: 1.6; }
 
-    .food-rank {
-      font-size: 11px;
-      color: #a0845c;
-      width: 20px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
+    /* 피드백 */
+    .feedback-card { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 20px 22px; margin-bottom: 14px; text-align: center; }
+    .feedback-title { font-size: 13px; color: #666; margin-bottom: 4px; }
+    .feedback-sub { font-size: 11px; color: #333; margin-bottom: 16px; }
+    .feedback-btns { display: flex; gap: 10px; }
+    .fb-btn { flex: 1; padding: 12px; border-radius: 4px; border: 1px solid #2a2a2a; background: #1a1a1a; color: #555; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .fb-btn:hover { border-color: #c9a96e; color: #c9a96e; }
+    .fb-btn.yes { background: #0d2010; border-color: #2d6a3f; color: #5DCAA5; }
+    .fb-btn.no { background: #200d0d; border-color: #6a2d2d; color: #E24B4A; }
 
-    .food-info { flex: 1; }
+    /* 다시하기 */
+    .retry-btn { width: 100%; padding: 15px; background: transparent; border: 1px solid #1e1e1e; color: #444; font-size: 13px; cursor: pointer; border-radius: 4px; margin-top: 6px; transition: all 0.2s; letter-spacing: 1px; }
+    .retry-btn:hover { border-color: #a0845c; color: #a0845c; }
 
-    .food-name {
-      font-size: 15px;
-      font-weight: 500;
-      color: #f5f0e8;
-      margin-bottom: 3px;
-    }
-
-    .food-reason {
-      font-size: 12px;
-      color: #555;
-      line-height: 1.6;
-    }
-
-    /* 다시하기 버튼 */
-    .retry-btn {
-      width: 100%;
-      padding: 16px;
-      background: transparent;
-      border: 1px solid #2a2a2a;
-      color: #666;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 4px;
-      margin-top: 10px;
-      transition: all 0.2s;
-      letter-spacing: 1px;
-    }
-
-    .retry-btn:hover {
-      border-color: #a0845c;
-      color: #a0845c;
-    }
-
-    /* 로딩 화면 */
-    #loadingScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-    }
-
-    .loading-text {
-      font-size: 14px;
-      color: #a0845c;
-      letter-spacing: 2px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    .loading-sub {
-      font-size: 12px;
-      color: #333;
-      margin-top: 10px;
-      letter-spacing: 1px;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    /* 결과 화면 (처음엔 숨김) */
-    #resultScreen { display: none; }
+    /* 로딩 */
+    #loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; gap: 14px; }
+    .loading-main { font-size: 14px; color: #a0845c; letter-spacing: 2px; animation: blink 1.5s ease-in-out infinite; }
+    .loading-step { font-size: 12px; color: #2a2a2a; letter-spacing: 1px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    #result { display: none; }
   </style>
 </head>
 <body>
 
   <!-- 로딩 화면 -->
-  <div id="loadingScreen">
-    <div class="loading-text">도사가 천기를 읽는 중...</div>
-    <div class="loading-sub">잠시만 기다려주세요</div>
+  <div id="loading">
+    <div class="loading-main">도사가 천기를 읽는 중...</div>
+    <div class="loading-step" id="loadingStep">점괘를 뽑고 있습니다</div>
   </div>
 
   <!-- 결과 화면 -->
-  <div id="resultScreen">
-    <div class="result-wrap">
+  <div id="result">
+    <div class="wrap">
 
       <!-- 헤더 -->
-      <div class="result-header">
-        <div class="result-badge">오늘의 점(占)심(心)</div>
-        <div class="result-name" id="resultName">홍길동<span>님</span></div>
-        <div class="result-meta" id="resultMeta">INTJ · 1990년생 · 남성</div>
+      <div class="header">
+        <div class="badge">오늘의 점(占)심(心)</div>
+        <div class="user-name" id="userName">홍길동<span>님</span></div>
+        <div class="user-meta" id="userMeta">INTJ · 1990년생 · 남성</div>
         <div class="mode-badge" id="modeBadge">⚖️ 밸런스 모드</div>
       </div>
 
-      <!-- 오늘의 한마디 (메인 팩폭) -->
-      <div class="main-verdict">
-        <div class="verdict-quote" id="verdictQuote">
-          "오늘은 결정을 미루는 게 오히려 득이 되는 날.<br>
-          머릿속이 복잡하다면, 그건 신호다."
-        </div>
+      <!-- 메인 팩폭 -->
+      <div class="verdict-card">
+        <div class="verdict-text" id="verdictText"></div>
         <div class="verdict-sign">— 점심도사 왈</div>
       </div>
 
-      <!-- 오늘의 운세 점수 -->
-      <div class="result-card">
+      <!-- 운세 점수 -->
+      <div class="card">
         <div class="card-label">오늘의 운세 점수</div>
         <div class="score-row">
-          <div class="score-label">전체</div>
-          <div class="score-bar-wrap"><div class="score-bar" id="bar-overall" style="width:0%"></div></div>
-          <div class="score-num" id="num-overall">0</div>
+          <div class="score-label">전체운</div>
+          <div class="score-bar-bg"><div class="score-bar" id="s-overall"></div></div>
+          <div class="score-num" id="n-overall">0</div>
         </div>
         <div class="score-row">
-          <div class="score-label">재물</div>
-          <div class="score-bar-wrap"><div class="score-bar" id="bar-money" style="width:0%"></div></div>
-          <div class="score-num" id="num-money">0</div>
+          <div class="score-label">재물운</div>
+          <div class="score-bar-bg"><div class="score-bar" id="s-money"></div></div>
+          <div class="score-num" id="n-money">0</div>
         </div>
         <div class="score-row">
-          <div class="score-label">연애</div>
-          <div class="score-bar-wrap"><div class="score-bar" id="bar-love" style="width:0%"></div></div>
-          <div class="score-num" id="num-love">0</div>
+          <div class="score-label">연애운</div>
+          <div class="score-bar-bg"><div class="score-bar" id="s-love"></div></div>
+          <div class="score-num" id="n-love">0</div>
         </div>
         <div class="score-row">
-          <div class="score-label">건강</div>
-          <div class="score-bar-wrap"><div class="score-bar" id="bar-health" style="width:0%"></div></div>
-          <div class="score-num" id="num-health">0</div>
+          <div class="score-label">직장운</div>
+          <div class="score-bar-bg"><div class="score-bar" id="s-work"></div></div>
+          <div class="score-num" id="n-work">0</div>
         </div>
       </div>
 
-      <!-- 도사의 팩폭 -->
-      <div class="result-card">
-        <div class="card-label">도사의 한마디</div>
-        <div class="card-title" id="pakpokTitle">오늘 당신의 판단을 믿지 마세요</div>
-        <div class="card-body" id="pakpokBody">
-          INTJ 특유의 과신이 오늘따라 독이 됩니다.
-          수(水) 기운이 강한 날, 감정보다 데이터를 믿으세요.
-          중요한 결정은 내일로 미루는 게 통계적으로 유리합니다.
+      <!-- 주역 점괘 -->
+      <div class="card">
+        <div class="card-label">오늘의 점괘 (주역)</div>
+        <div class="gua-row">
+          <div class="gua-symbol" id="guaSymbol">䷀</div>
+          <div>
+            <div class="gua-name" id="guaName">건괘</div>
+            <div class="gua-keyword" id="guaKeyword">하늘 · 강건</div>
+          </div>
         </div>
+        <div class="gua-meaning" id="guaMeaning"></div>
+      </div>
+
+      <!-- 타로 2장 -->
+      <div class="card">
+        <div class="card-label">오늘의 타로</div>
+        <div class="tarot-item" id="tarot1"></div>
+        <div class="tarot-item" id="tarot2"></div>
+      </div>
+
+      <!-- 결핍 배너 — 태어난 시 모를 때만 표시 -->
+      <div class="missing-banner" id="missingBanner" style="display:none">
+        <div class="missing-title">⚠️ 정확한 풀이를 위해 하나의 기둥이 부족합니다</div>
+        <div class="missing-desc">
+          사주는 년·월·일·시 네 기둥으로 완성됩니다.<br>
+          태어난 시를 모르면 운세의 25%가 빠진 채로 분석됩니다.<br><br>
+          몇 가지 질문으로 태어난 시를 역추론해드릴 수 있습니다.
+        </div>
+        <button class="missing-btn" onclick="alert('태어난 시 역추론 — 다음 업데이트에서 오픈됩니다! 🔮')">
+          내 태어난 시 추론해보기 →
+        </button>
       </div>
 
       <!-- 점심 추천 -->
-      <div class="food-card">
+      <div class="card">
         <div class="card-label">오늘의 점심 추천</div>
-        <div id="foodList">
-          <div class="food-item">
-            <div class="food-rank">01</div>
-            <div class="food-info">
-              <div class="food-name">미역국 + 현미밥</div>
-              <div class="food-reason">수(水) 기운 보충. 오늘 부족한 집중력을 음식으로 채우세요.</div>
-            </div>
-          </div>
-          <div class="food-item">
-            <div class="food-rank">02</div>
-            <div class="food-info">
-              <div class="food-name">두부김치</div>
-              <div class="food-reason">목(木) 기운 활성화. 판단력 회복에 도움이 되는 조합입니다.</div>
-            </div>
-          </div>
-          <div class="food-item">
-            <div class="food-rank">03</div>
-            <div class="food-info">
-              <div class="food-name">아메리카노 (뜨거운 것)</div>
-              <div class="food-reason">화(火) 기운 자극. 오전 기운이 처질 때 각성 효과.</div>
-            </div>
-          </div>
+        <div id="foodList"></div>
+      </div>
+
+      <!-- 피드백 루프 -->
+      <div class="feedback-card">
+        <div class="feedback-title">오늘 도사의 말이 맞았나요?</div>
+        <div class="feedback-sub">피드백이 쌓이면 나만의 적중률 스탯이 생깁니다</div>
+        <div class="feedback-btns">
+          <button class="fb-btn" id="btnYes" onclick="feedback('yes')">✓ 맞았어요</button>
+          <button class="fb-btn" id="btnNo" onclick="feedback('no')">✗ 틀렸어요</button>
         </div>
       </div>
 
-      <!-- 다시하기 -->
-      <button class="retry-btn" onclick="location.href='index.html'">
-        ← 처음으로 돌아가기
-      </button>
+      <button class="retry-btn" onclick="location.href='index.html'">← 처음으로 돌아가기</button>
 
     </div>
   </div>
 
   <script>
-    // URL 파라미터에서 데이터 받아오기
-    // index.html에서 submitForm() 할 때 이 페이지로 데이터 넘겨줌
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get('name') || '도사';
-    const mbti = params.get('mbti') || 'INTJ';
-    const year = params.get('year') || '1990';
-    const gender = params.get('gender') === 'male' ? '남성' : '여성';
-    const trust = parseInt(params.get('trust') || '2');
+    // =====================
+    // URL 파라미터 파싱
+    // =====================
+    const p = new URLSearchParams(window.location.search);
+    const name   = p.get('name')   || '도사';
+    const mbti   = p.get('mbti')   || 'INTJ';
+    const year   = p.get('year')   || '1990';
+    const gender = p.get('gender') === 'male' ? '남성' : '여성';
+    const trust  = parseInt(p.get('trust') || '2');
+    const hour   = p.get('hour')   || 'unknown';
 
-    // 신뢰도에 따른 모드 텍스트
-    const modeTexts = [
-      '🔬 완전 과학 모드',
-      '📊 데이터 우선 모드',
-      '⚖️ 밸런스 모드',
-      '🌙 운세 참고 모드',
-      '🔮 신비 모드',
-      '🌟 완전 신비 모드',
-    ];
-
-    // 신뢰도(0~5)에 따라 다른 팩폭 문구
-    // 0 = 과학적, 5 = 신비로운 톤
-    const verdicts = [
-      // trust 0 — 완전 과학
-      `"${mbti} 유형은 오늘 인지 부하가 높은 상태입니다.<br>의사결정을 최소화하고 루틴에 집중하세요."`,
-      // trust 1
-      `"데이터상 오늘은 새로운 시도보다 검증된 방식이 유리합니다.<br>사주 패턴도 같은 방향을 가리키고 있어요."`,
-      // trust 2 — 밸런스
-      `"오늘은 결정을 미루는 게 오히려 득이 되는 날.<br>머릿속이 복잡하다면, 그건 신호입니다."`,
-      // trust 3
-      `"사주의 흐름상 오늘은 밀기보다 기다리는 날.<br>${mbti}의 직관을 믿되, 서두르지 마세요."`,
-      // trust 4
-      `"오늘 천간의 기운이 당신의 결정을 흔들고 있습니다.<br>고요히 기다리면 길이 보일 것입니다."`,
-      // trust 5 — 완전 신비
-      `"오늘의 기운은 물처럼 조용히 흐릅니다.<br>억지로 막으려 하지 말고, 흐름에 몸을 맡기십시오."`,
-    ];
-
-    // 오늘 날짜 기반으로 점수 생성
-    // (나중에 실제 사주 계산으로 교체 예정)
-    function getDailyScore(seed) {
-      // 날짜 + 이름으로 시드 만들어서 매일 다른 점수
+    // =====================
+    // 시드 기반 난수
+    // 같은 사람 + 같은 날 = 같은 결과
+    // =====================
+    function rand(seed, max) {
       const today = new Date().toDateString();
-      let hash = 0;
-      for (let c of (today + seed)) hash = (hash * 31 + c.charCodeAt(0)) % 100;
-      return Math.max(30, Math.min(95, hash));
+      let h = 0;
+      for (const c of (today + name + seed)) {
+        h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
+      }
+      return Math.abs(h) % max;
     }
 
-    // 점수 바 애니메이션
-    function animateBar(id, numId, score) {
-      setTimeout(() => {
-        document.getElementById(id).style.width = score + '%';
-        document.getElementById(numId).textContent = score;
-      }, 300);
+    function score(seed) {
+      return Math.max(33, Math.min(96, 40 + rand(seed, 56)));
     }
 
-    // 로딩 화면 → 결과 화면 전환 (1.5초 후)
+    // =====================
+    // 신뢰도별 텍스트
+    // =====================
+    const MODES = [
+      '🔬 완전 과학 모드','📊 데이터 우선 모드','⚖️ 밸런스 모드',
+      '🌙 운세 참고 모드','🔮 신비 모드','🌟 완전 신비 모드'
+    ];
+
+    const VERDICTS = [
+      `${mbti} 유형 분석 결과, 오늘은 인지 부하가 높은 상태입니다. 의사결정을 최소화하고 루틴에 집중하세요.`,
+      `데이터 패턴상 오늘은 새로운 시도보다 검증된 방식이 유리합니다. 사주 흐름도 같은 방향을 가리키고 있어요.`,
+      `오늘은 결정을 미루는 게 오히려 득이 되는 날. 머릿속이 복잡하다면, 그건 신호입니다.`,
+      `사주의 흐름상 오늘은 밀기보다 기다리는 날. ${mbti}의 직관을 믿되, 서두르지 마세요.`,
+      `오늘 천간의 기운이 당신의 결정을 흔들고 있습니다. 고요히 기다리면 길이 보일 것입니다.`,
+      `오늘의 기운은 물처럼 조용히 흐릅니다. 억지로 막으려 하지 말고, 흐름에 몸을 맡기십시오.`,
+    ];
+
+    // =====================
+    // 타로 카드 HTML
+    // =====================
+    function tarotHTML(card, label, dir) {
+      return `
+        <div class="tarot-row">
+          <div class="tarot-symbol">${card.symbol}</div>
+          <div>
+            <div class="tarot-name">${card.name}</div>
+            <div class="tarot-sub">${label} · ${dir}</div>
+          </div>
+        </div>
+        <div class="tarot-meaning">${dir === '역방향' ? '(역방향) ' : ''}${card.meaning}</div>
+      `;
+    }
+
+    // =====================
+    // 피드백
+    // =====================
+    function feedback(ans) {
+      document.getElementById('btnYes').className = 'fb-btn' + (ans==='yes' ? ' yes' : '');
+      document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no'  ? ' no'  : '');
+      console.log('피드백:', ans); // 나중에 Firebase 저장 예정
+    }
+
+    // =====================
+    // 로딩 스텝 애니메이션
+    // =====================
+    const steps = ['점괘를 뽑고 있습니다','타로를 펼치는 중입니다','사주를 분석하고 있습니다','운세를 정리하고 있습니다'];
+    let si = 0;
+    const timer = setInterval(() => {
+      si = (si + 1) % steps.length;
+      const el = document.getElementById('loadingStep');
+      if (el) el.textContent = steps[si];
+    }, 550);
+
+    // =====================
+    // 결과 렌더링 (1.8초 후)
+    // =====================
     setTimeout(() => {
-      document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('resultScreen').style.display = 'block';
+      clearInterval(timer);
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('result').style.display  = 'block';
 
-      // 텍스트 채우기
-      document.getElementById('resultName').innerHTML = `${name}<span>님</span>`;
-      document.getElementById('resultMeta').textContent = `${mbti} · ${year}년생 · ${gender}`;
-      document.getElementById('modeBadge').textContent = modeTexts[trust];
-      document.getElementById('verdictQuote').innerHTML = verdicts[trust];
+      // 헤더
+      document.getElementById('userName').innerHTML = `${name}<span>님</span>`;
+      document.getElementById('userMeta').textContent = `${mbti} · ${year}년생 · ${gender}`;
+      document.getElementById('modeBadge').textContent = MODES[trust];
+      document.getElementById('verdictText').textContent = `"${VERDICTS[trust]}"`;
 
-      // 점수 애니메이션
-      animateBar('bar-overall', 'num-overall', getDailyScore(name + 'overall'));
-      animateBar('bar-money',   'num-money',   getDailyScore(name + 'money'));
-      animateBar('bar-love',    'num-love',    getDailyScore(name + 'love'));
-      animateBar('bar-health',  'num-health',  getDailyScore(name + 'health'));
+      // 점수 (300ms 딜레이로 바 애니메이션)
+      setTimeout(() => {
+        [['overall','전체'],['money','재물'],['love','연애'],['work','직장']].forEach(([k]) => {
+          const v = score(k);
+          document.getElementById(`s-${k}`).style.width = v + '%';
+          document.getElementById(`n-${k}`).textContent = v;
+        });
+      }, 300);
 
-    }, 1500);
+      // 점괘
+      const gua = GUA[rand('gua', GUA.length)];
+      document.getElementById('guaSymbol').textContent  = gua.symbol;
+      document.getElementById('guaName').textContent    = gua.name;
+      document.getElementById('guaKeyword').textContent = gua.num + ' · ' + gua.keyword;
+      document.getElementById('guaMeaning').textContent = gua.meaning;
+
+      // 타로 2장 (중복 없이)
+      const i1 = rand('t1', TAROT.length);
+      let   i2 = rand('t2', TAROT.length);
+      if (i2 === i1) i2 = (i2 + 1) % TAROT.length;
+      const d1 = rand('d1', 2) === 0 ? '정방향' : '역방향';
+      const d2 = rand('d2', 2) === 0 ? '정방향' : '역방향';
+      document.getElementById('tarot1').innerHTML = tarotHTML(TAROT[i1], '현재', d1);
+      document.getElementById('tarot2').innerHTML = tarotHTML(TAROT[i2], '조언', d2);
+
+      // 결핍 배너 (태어난 시 모를 때)
+      if (hour === 'unknown') {
+        document.getElementById('missingBanner').style.display = 'block';
+      }
+
+      // 점심 추천
+      const 오늘오행 = 오행목록[rand('food', 5)];
+      document.getElementById('foodList').innerHTML =
+        FOODS[오늘오행].map((f, i) => `
+          <div class="food-item">
+            <div class="food-rank">0${i+1}</div>
+            <div>
+              <div class="food-name">${f.name}</div>
+              <div class="food-reason">${f.reason}</div>
+            </div>
+          </div>
+        `).join('');
+
+    }, 1800);
   </script>
-
 </body>
 </html>
