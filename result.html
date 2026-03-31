@@ -161,11 +161,12 @@
         <div class="gua-meaning" id="guaMeaning"></div>
       </div>
 
-      <!-- 타로 2장 -->
+      <!-- 타로 3장 -->
       <div class="card">
-        <div class="card-label">오늘의 타로</div>
+        <div class="card-label">오늘의 타로 — 과거 · 현재 · 미래</div>
         <div class="tarot-item" id="tarot1"></div>
         <div class="tarot-item" id="tarot2"></div>
+        <div class="tarot-item" id="tarot3"></div>
       </div>
 
       <!-- 결핍 배너 — 태어난 시 모를 때만 표시 -->
@@ -314,14 +315,23 @@
       document.getElementById('guaKeyword').textContent = gua.num + ' · ' + gua.keyword;
       document.getElementById('guaMeaning').textContent = gua.meaning;
 
-      // 타로 2장 (중복 없이)
-      const i1 = rand('t1', TAROT.length);
-      let   i2 = rand('t2', TAROT.length);
-      if (i2 === i1) i2 = (i2 + 1) % TAROT.length;
+    // 메이저 아르카나 22장만 사용
+      const MAJOR = TAROT.slice(0, 22);
+
+      // 3장 중복 없이 뽑기
+      const i1 = rand('t1', 22);
+      let   i2 = rand('t2', 22);
+      let   i3 = rand('t3', 22);
+      if (i2 === i1) i2 = (i2 + 1) % 22;
+      if (i3 === i1 || i3 === i2) i3 = (i3 + 2) % 22;
+
       const d1 = rand('d1', 2) === 0 ? '정방향' : '역방향';
       const d2 = rand('d2', 2) === 0 ? '정방향' : '역방향';
-      document.getElementById('tarot1').innerHTML = tarotHTML(TAROT[i1], '현재', d1);
-      document.getElementById('tarot2').innerHTML = tarotHTML(TAROT[i2], '조언', d2);
+      const d3 = rand('d3', 2) === 0 ? '정방향' : '역방향';
+
+      document.getElementById('tarot1').innerHTML = tarotHTML(MAJOR[i1], '과거', d1);
+      document.getElementById('tarot2').innerHTML = tarotHTML(MAJOR[i2], '현재', d2);
+      document.getElementById('tarot3').innerHTML = tarotHTML(MAJOR[i3], '미래', d3);
 
       // 결핍 배너 (태어난 시 모를 때)
       if (hour === 'unknown') {
