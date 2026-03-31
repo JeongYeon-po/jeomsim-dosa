@@ -636,8 +636,15 @@
         trustLevel: selectedTrust,
       };
 
-      console.log('제출된 데이터:', formData);
-      alert(`${formData.name || '도사'}님, 잠시만요... 곧 운세를 풀어드릴게요! 🔮`);
+      // 데이터를 URL 파라미터로 result.html에 넘기기
+const query = new URLSearchParams({
+  name: formData.name,
+  mbti: formData.mbti,
+  year: formData.year,
+  gender: formData.gender,
+  trust: formData.trustLevel,
+}).toString();
+location.href = `result.html?${query}`;
     }
 
     initDateSelects();
