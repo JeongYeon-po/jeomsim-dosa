@@ -295,7 +295,7 @@
 
       // 점수 (300ms 딜레이로 바 애니메이션)
       setTimeout(() => {
-        [['overall','전체'],['money','재물'],['love','연애'],['work','직장']].forEach(([k]) => {
+        [['overall','전체'],['money','재물'],['love','연애'],['work','직장'],['health','건강']].forEach(([k]) => {
           const v = score(k);
           document.getElementById(`s-${k}`).style.width = v + '%';
           document.getElementById(`n-${k}`).textContent = v;
