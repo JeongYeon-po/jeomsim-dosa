@@ -1,23 +1,41 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>점(占)심(心)도사</title>
   <style>
+    /* =====================
+       기본 리셋 & 전체 레이아웃
+    ===================== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Apple SD Gothic Neo', sans-serif;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
       background: #0d0d0d;
       color: #f5f0e8;
       min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* =====================
+       랜딩 화면 (처음 보이는 화면)
+    ===================== */
+    #landingPage {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      min-height: 100vh;
       text-align: center;
-      padding: 20px;
     }
+
+    /* 입력 폼 화면 (처음엔 숨김) */
+    #formPage { display: none; max-width: 480px; margin: 0 auto; padding: 40px 20px; }
+
+    /* =====================
+       랜딩 텍스트 스타일
+    ===================== */
     .badge {
       font-size: 12px;
       letter-spacing: 3px;
@@ -25,6 +43,7 @@
       margin-bottom: 20px;
       text-transform: uppercase;
     }
+
     h1 {
       font-size: 52px;
       font-weight: 300;
@@ -32,24 +51,32 @@
       line-height: 1.1;
       margin-bottom: 8px;
     }
+
     h1 span { color: #c9a96e; }
+
     .sub {
       font-size: 14px;
       color: #666;
       letter-spacing: 2px;
       margin-bottom: 48px;
     }
+
     .copy-main {
       font-size: 18px;
       color: #d4b896;
       margin-bottom: 8px;
       font-weight: 300;
     }
+
     .copy-sub {
       font-size: 13px;
       color: #555;
       margin-bottom: 60px;
     }
+
+    /* =====================
+       버튼 공통 스타일
+    ===================== */
     .cta {
       background: #c9a96e;
       color: #0d0d0d;
@@ -62,23 +89,639 @@
       border-radius: 2px;
       transition: background 0.2s;
     }
+
     .cta:hover { background: #b8956a; }
+
     .footer {
-      position: absolute;
+      position: fixed;
       bottom: 30px;
       font-size: 11px;
       color: #333;
       letter-spacing: 1px;
     }
+
+    /* =====================
+       입력 폼 섹션 스타일
+    ===================== */
+    .form-section {
+      margin-bottom: 36px;
+      border-bottom: 1px solid #1e1e1e;
+      padding-bottom: 32px;
+    }
+
+    /* 섹션 번호 + 제목 */
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #a0845c;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 20px;
+      color: #f5f0e8;
+    }
+
+    /* =====================
+       양력/음력 토글 버튼
+    ===================== */
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 10px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #666;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    /* 선택된 토글 버튼 */
+    .toggle-btn.active {
+      background: #c9a96e;
+      border-color: #c9a96e;
+      color: #0d0d0d;
+      font-weight: 600;
+    }
+
+    /* =====================
+       입력 필드 스타일
+    ===================== */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .input-group label {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    .input-group input,
+    .input-group select {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #f5f0e8;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #c9a96e;
+    }
+
+    /* select 드롭다운 화살표 색상 */
+    .input-group select option { background: #1a1a1a; }
+
+    /* =====================
+       성별 선택 버튼
+    ===================== */
+    .gender-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .gender-btn {
+      flex: 1;
+      padding: 12px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #666;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .gender-btn.active {
+      background: #1a1a1a;
+      border-color: #c9a96e;
+      color: #c9a96e;
+    }
+
+    /* =====================
+       MBTI 버튼 그리드 (4x4)
+    ===================== */
+    .mbti-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .mbti-btn {
+      padding: 9px 4px;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #888;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .mbti-btn.active {
+      background: #1e1810;
+      border-color: #c9a96e;
+      color: #c9a96e;
+      font-weight: 600;
+    }
+
+    /* MBTI 모름 링크 */
+    .mbti-unknown {
+      font-size: 12px;
+      color: #555;
+      margin-top: 8px;
+    }
+
+    .mbti-unknown a {
+      color: #a0845c;
+      text-decoration: none;
+    }
+
+    .mbti-unknown a:hover { text-decoration: underline; }
+
+    /* =====================
+       신뢰도 슬라이더 섹션
+    ===================== */
+    .slider-container { margin-bottom: 16px; }
+
+    /* 슬라이더 양쪽 레이블 */
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .slider-label-left {
+      font-size: 11px;
+      color: #666;
+      max-width: 45%;
+      line-height: 1.4;
+    }
+
+    .slider-label-right {
+      font-size: 11px;
+      color: #666;
+      max-width: 45%;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    /* 슬라이더 본체 */
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 2px;
+      background: #2a2a2a;
+      border-radius: 2px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #c9a96e;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* 슬라이더 현재값 표시 */
+    .slider-value {
+      text-align: center;
+      font-size: 13px;
+      color: #a0845c;
+      min-height: 36px;
+      line-height: 1.5;
+    }
+
+    /* =====================
+       제출 버튼
+    ===================== */
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: #c9a96e;
+      color: #0d0d0d;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover { background: #b8956a; }
+    .submit-btn:disabled { background: #333; color: #555; cursor: not-allowed; }
+
+    /* =====================
+       폼 상단 뒤로가기
+    ===================== */
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 0;
+    }
+
+    .form-title {
+      font-size: 14px;
+      color: #a0845c;
+      letter-spacing: 2px;
+    }
   </style>
 </head>
 <body>
-  <div class="badge">AI 운세 · 건강 · 점심 추천</div>
-  <h1>점<span>(占)</span>심<span>(心)</span><br>도사</h1>
-  <div class="sub">당신의 하루 마음과 몸을 책임져드립니다</div>
-  <div class="copy-main">점은 봐줄게. 점심은 덤이야.</div>
-  <div class="copy-sub">사주 · MBTI · 건강 상태로 오늘을 꿰뚫는 AI 도사</div>
-  <button class="cta" onclick="alert('곧 오픈합니다 🔮')">도사 소환하기</button>
-  <div class="footer">점(占)심(心)도사 · AI FORTUNE · 2026</div>
+
+  <!-- =====================
+       1. 랜딩 페이지 (첫 화면)
+  ===================== -->
+  <div id="landingPage">
+    <div class="badge">AI 운세 · 건강 · 점심 추천</div>
+
+    <h1>점<span>(占)</span>심<span>(心)</span><br>도사</h1>
+    <div class="sub">당신의 하루 마음과 몸을 책임져드립니다</div>
+
+    <div class="copy-main">점은 봐줄게. 점심은 덤이야.</div>
+    <div class="copy-sub">사주 · MBTI · 건강 상태로 오늘을 꿰뚫는 AI 도사</div>
+
+    <!-- 이 버튼 누르면 입력 폼으로 전환 -->
+    <button class="cta" onclick="showForm()">도사 소환하기</button>
+
+    <div class="footer">점(占)심(心)도사 · AI FORTUNE · 2026</div>
+  </div>
+
+
+  <!-- =====================
+       2. 입력 폼 페이지 (도사 소환하기 누르면 등장)
+  ===================== -->
+  <div id="formPage">
+
+    <!-- 상단: 뒤로가기 + 타이틀 -->
+    <div class="form-header">
+      <button class="back-btn" onclick="showLanding()">←</button>
+      <span class="form-title">도사에게 정보 전달하기</span>
+    </div>
+
+
+    <!-- =====================
+         STEP 1. 생년월일 + 태어난 시
+    ===================== -->
+    <div class="form-section">
+      <div class="section-label">STEP 01</div>
+      <div class="section-title">언제 태어나셨어요?</div>
+
+      <!-- 양력 / 음력 선택 토글 -->
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="solarBtn" onclick="setCalType('solar')">양력</button>
+        <button class="toggle-btn" id="lunarBtn" onclick="setCalType('lunar')">음력</button>
+      </div>
+
+      <!-- 생년월일 입력 (년/월/일 따로) -->
+      <div class="input-row">
+        <div class="input-group">
+          <label>년</label>
+          <!-- 1930년부터 현재 연도까지 select로 채워짐 (JS에서 처리) -->
+          <select id="birthYear"></select>
+        </div>
+        <div class="input-group">
+          <label>월</label>
+          <select id="birthMonth">
+            <!-- 1~12월 JS에서 채움 -->
+          </select>
+        </div>
+        <div class="input-group">
+          <label>일</label>
+          <select id="birthDay">
+            <!-- 1~31일 JS에서 채움 -->
+          </select>
+        </div>
+      </div>
+
+      <!-- 태어난 시간 선택 -->
+      <div class="input-group">
+        <label>태어난 시간 (모르면 "모름" 선택)</label>
+        <select id="birthHour">
+          <option value="unknown">모름</option>
+          <!-- 시진(時辰) 12개 JS에서 채움 -->
+        </select>
+      </div>
+    </div>
+
+
+    <!-- =====================
+         STEP 2. 이름 + 성별
+    ===================== -->
+    <div class="form-section">
+      <div class="section-label">STEP 02</div>
+      <div class="section-title">이름과 성별을 알려주세요</div>
+
+      <!-- 이름 입력 -->
+      <div class="input-group" style="margin-bottom: 16px;">
+        <label>이름</label>
+        <input type="text" id="userName" placeholder="홍길동" maxlength="10" />
+      </div>
+
+      <!-- 성별 선택 (남/여 버튼) -->
+      <div class="gender-group">
+        <button class="gender-btn" id="genderMale" onclick="setGender('male')">남성</button>
+        <button class="gender-btn" id="genderFemale" onclick="setGender('female')">여성</button>
+      </div>
+    </div>
+
+
+    <!-- =====================
+         STEP 3. MBTI 선택
+    ===================== -->
+    <div class="form-section">
+      <div class="section-label">STEP 03</div>
+      <div class="section-title">MBTI를 선택해주세요</div>
+
+      <!-- MBTI 16가지 버튼 그리드 -->
+      <div class="mbti-grid" id="mbtiGrid">
+        <!-- JS에서 16개 버튼 자동 생성 -->
+      </div>
+
+      <!-- MBTI 모르는 경우 링크 -->
+      <div class="mbti-unknown">
+        MBTI 모르세요? →
+        <a href="https://www.16personalities.com/ko" target="_blank">
+          16personalities에서 무료 검사하기
+        </a>
+      </div>
+    </div>
+
+
+    <!-- =====================
+         STEP 4. 신뢰도 슬라이더
+         (0 = 과학적 분석 / 5 = 신비로운 운세)
+    ===================== -->
+    <div class="form-section">
+      <div class="section-label">STEP 04</div>
+      <div class="section-title">도사에게 어떤 방식으로 말해달라고 할까요?</div>
+
+      <div class="slider-container">
+
+        <!-- 슬라이더 양쪽 설명 -->
+        <div class="slider-labels">
+          <span class="slider-label-left">🔬 심리학 · 데이터<br>분석 기반으로</span>
+          <span class="slider-label-right">🔮 사주 · 운세<br>신비의 영역으로</span>
+        </div>
+
+        <!-- 슬라이더 (0~5, 기본값 2) -->
+        <input
+          type="range"
+          id="trustSlider"
+          min="0" max="5" value="2" step="1"
+          oninput="updateSliderText(this.value)"
+        />
+
+        <!-- 슬라이더 현재 값에 따라 설명 텍스트 바뀜 -->
+        <div class="slider-value" id="sliderValueText"></div>
+      </div>
+    </div>
+
+
+    <!-- =====================
+         최종 제출 버튼
+         → 나중에 Claude API 호출 연결 예정
+    ===================== -->
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+      도사에게 물어보기 🔮
+    </button>
+
+  </div><!-- /formPage -->
+
+
+  <script>
+    // =====================
+    // 전역 상태값 저장
+    // (사용자가 선택한 값들 여기 모임)
+    // =====================
+    let selectedCalType = 'solar';   // 양력/음력
+    let selectedGender = null;       // 성별
+    let selectedMbti = null;         // MBTI
+    let selectedTrust = 2;           // 신뢰도 슬라이더 기본값
+
+
+    // =====================
+    // 페이지 전환 함수
+    // =====================
+
+    // 랜딩 → 폼 화면으로 전환
+    function showForm() {
+      document.getElementById('landingPage').style.display = 'none';
+      document.getElementById('formPage').style.display = 'block';
+      window.scrollTo(0, 0); // 페이지 맨 위로 스크롤
+    }
+
+    // 폼 → 랜딩 화면으로 뒤로가기
+    function showLanding() {
+      document.getElementById('formPage').style.display = 'none';
+      document.getElementById('landingPage').style.display = 'flex';
+    }
+
+
+    // =====================
+    // STEP 1: 생년월일 select 옵션 자동 생성
+    // =====================
+    function initDateSelects() {
+      const yearSelect = document.getElementById('birthYear');
+      const monthSelect = document.getElementById('birthMonth');
+      const daySelect = document.getElementById('birthDay');
+
+      // 년도: 1930 ~ 현재 연도
+      const currentYear = new Date().getFullYear();
+      for (let y = currentYear; y >= 1930; y--) {
+        yearSelect.innerHTML += `<option value="${y}">${y}년</option>`;
+      }
+
+      // 월: 1 ~ 12
+      for (let m = 1; m <= 12; m++) {
+        monthSelect.innerHTML += `<option value="${m}">${m}월</option>`;
+      }
+
+      // 일: 1 ~ 31
+      for (let d = 1; d <= 31; d++) {
+        daySelect.innerHTML += `<option value="${d}">${d}일</option>`;
+      }
+    }
+
+    // 양력/음력 선택 토글
+    function setCalType(type) {
+      selectedCalType = type;
+      // 버튼 active 클래스 교체
+      document.getElementById('solarBtn').classList.toggle('active', type === 'solar');
+      document.getElementById('lunarBtn').classList.toggle('active', type === 'lunar');
+    }
+
+
+    // =====================
+    // STEP 1: 태어난 시간 (시진) select 생성
+    // 한국 전통 시진 12개
+    // =====================
+    function initHourSelect() {
+      const hourSelect = document.getElementById('birthHour');
+      const hours = [
+        { value: 'unknown', label: '모름' },
+        { value: '자시', label: '자시 (子時) 23:00 ~ 01:00' },
+        { value: '축시', label: '축시 (丑時) 01:00 ~ 03:00' },
+        { value: '인시', label: '인시 (寅時) 03:00 ~ 05:00' },
+        { value: '묘시', label: '묘시 (卯時) 05:00 ~ 07:00' },
+        { value: '진시', label: '진시 (辰時) 07:00 ~ 09:00' },
+        { value: '사시', label: '사시 (巳時) 09:00 ~ 11:00' },
+        { value: '오시', label: '오시 (午時) 11:00 ~ 13:00' },
+        { value: '미시', label: '미시 (未時) 13:00 ~ 15:00' },
+        { value: '신시', label: '신시 (申時) 15:00 ~ 17:00' },
+        { value: '유시', label: '유시 (酉時) 17:00 ~ 19:00' },
+        { value: '술시', label: '술시 (戌時) 19:00 ~ 21:00' },
+        { value: '해시', label: '해시 (亥時) 21:00 ~ 23:00' },
+      ];
+      hourSelect.innerHTML = hours.map(h =>
+        `<option value="${h.value}">${h.label}</option>`
+      ).join('');
+    }
+
+
+    // =====================
+    // STEP 2: 성별 선택
+    // =====================
+    function setGender(gender) {
+      selectedGender = gender;
+      // 선택된 버튼만 active
+      document.getElementById('genderMale').classList.toggle('active', gender === 'male');
+      document.getElementById('genderFemale').classList.toggle('active', gender === 'female');
+    }
+
+
+    // =====================
+    // STEP 3: MBTI 버튼 16개 자동 생성
+    // =====================
+    function initMbtiGrid() {
+      const types = [
+        'INTJ','INTP','ENTJ','ENTP',
+        'INFJ','INFP','ENFJ','ENFP',
+        'ISTJ','ISFJ','ESTJ','ESFJ',
+        'ISTP','ISFP','ESTP','ESFP'
+      ];
+      const grid = document.getElementById('mbtiGrid');
+      grid.innerHTML = types.map(type =>
+        `<button class="mbti-btn" onclick="setMbti('${type}')" id="mbti-${type}">${type}</button>`
+      ).join('');
+    }
+
+    // MBTI 선택 처리
+    function setMbti(type) {
+      selectedMbti = type;
+      // 모든 버튼 active 해제 후 선택된 것만 active
+      document.querySelectorAll('.mbti-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`mbti-${type}`).classList.add('active');
+    }
+
+
+    // =====================
+    // STEP 4: 신뢰도 슬라이더 텍스트
+    // 값(0~5)에 따라 안내 문구 변경
+    // =====================
+    function updateSliderText(value) {
+      selectedTrust = parseInt(value);
+      const texts = [
+        '🔬 완전 과학 모드 — 심리학·통계 데이터 기반으로 냉철하게 분석해드립니다',
+        '📊 데이터 우선 모드 — 근거 중심이지만 사주 패턴도 참고합니다',
+        '⚖️ 밸런스 모드 — 데이터와 운세를 반반 섞어서 말씀드립니다',
+        '🌙 운세 참고 모드 — 사주·MBTI를 중심으로, 근거도 살짝 곁들입니다',
+        '🔮 신비 모드 — 도사가 운세와 사주의 언어로 직접 말씀드립니다',
+        '🌟 완전 신비 모드 — 오늘의 기운과 천명을 도사가 전해드립니다',
+      ];
+      document.getElementById('sliderValueText').textContent = texts[selectedTrust];
+    }
+
+
+    // =====================
+    // 최종 제출 함수
+    // 현재는 콘솔에 값 출력 (나중에 Claude API 호출로 교체 예정)
+    // =====================
+    function submitForm() {
+      // 필수값 검증
+      if (!selectedGender) {
+        alert('성별을 선택해주세요!');
+        return;
+      }
+      if (!selectedMbti) {
+        alert('MBTI를 선택해주세요! (모르면 16personalities에서 확인 가능해요)');
+        return;
+      }
+
+      // 입력값 수집
+      const formData = {
+        calType: selectedCalType,           // 양력/음력
+        year: document.getElementById('birthYear').value,
+        month: document.getElementById('birthMonth').value,
+        day: document.getElementById('birthDay').value,
+        hour: document.getElementById('birthHour').value,  // 시진
+        name: document.getElementById('userName').value,
+        gender: selectedGender,
+        mbti: selectedMbti,
+        trustLevel: selectedTrust,          // 신뢰도 0~5
+      };
+
+      // 콘솔에서 확인용 (개발 중)
+      console.log('제출된 데이터:', formData);
+
+      // 임시 알림 (나중에 결과 페이지로 이동으로 교체)
+      alert(`${formData.name || '도사'}님, 잠시만요... 곧 운세를 풀어드릴게요! 🔮`);
+    }
+
+
+    // =====================
+    // 페이지 로드 시 초기화
+    // (select 옵션들 미리 채워두기)
+    // =====================
+    initDateSelects();   // 년/월/일 select 채우기
+    initHourSelect();    // 시진 select 채우기
+    initMbtiGrid();      // MBTI 버튼 16개 생성
+    updateSliderText(2); // 슬라이더 기본값(2) 텍스트 초기화
+
+  </script>
 </body>
 </html>
