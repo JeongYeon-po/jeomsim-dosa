@@ -429,6 +429,97 @@
       `;
     }
 
+// =====================
+    // 운세 확인하기 버튼 클릭
+    // =====================
+    let fortuneLoaded = false;
+    async function loadFortune() {
+      if (fortuneLoaded) return;
+      fortuneLoaded = true;
+
+      // 버튼 숨기고 로딩 표시
+      document.getElementById('fortuneBtn').style.display = 'none';
+      document.getElementById('fortuneResult').style.display = 'block';
+      document.getElementById('verdictText').textContent = '도사가 천기를 읽는 중...';
+
+      // 점괘/타로/점심 섹션 펼치기
+      document.getElementById('guaSection').style.display  = 'block';
+      document.getElementById('tarotSection').style.display = 'block';
+      document.getElementById('foodSection').style.display  = 'block';
+
+      // 로그인 유저 확인
+      const user = auth.currentUser;
+      const today = new Date().toISOString().slice(0, 10);
+
+      // 캐시 확인
+      if (user) {
+        try {
+          const cacheRef = db.collection('pakpok').doc(`${user.uid}_${today}`);
+          const cached = await cacheRef.get();
+          if (cached.exists) {
+            console.log('팩폭 캐시 히트!');
+            document.getElementById('verdictText').textContent = cached.data().result;
+            return;
+          }
+        } catch(e) {}
+      }
+
+      // 비로그인이면 로그인 유도
+      if (!user) {
+        document.getElementById('verdictText').textContent =
+          '로그인하면 사주·MBTI·점괘·타로를 종합한 AI 팩폭 한마디를 들을 수 있어요.';
+        return;
+      }
+
+      // 점괘 + 타로 데이터 수집
+      const guaName  = document.getElementById('guaName')?.textContent  || '';
+      const guaMeaning = document.getElementById('guaMeaning')?.textContent || '';
+      const t1 = document.getElementById('tarot1')?.querySelector('.tarot-name')?.textContent || '';
+      const t2 = document.getElementById('tarot2')?.querySelector('.tarot-name')?.textContent || '';
+      const t3 = document.getElementById('tarot3')?.querySelector('.tarot-name')?.textContent || '';
+
+      const baziStr = baziData
+        ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
+        : '사주 데이터 없음';
+
+      const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+      const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+      const cnt = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+      if (baziData) {
+        [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
+          if (p && 천간오행[p.gan]) cnt[천간오행[p.gan]]++;
+          if (p && 지지오행[p.ji])  cnt[지지오행[p.ji]]++;
+        });
+      }
+      const ohengStr = Object.entries(cnt).map(([k,v]) => `${k}${v}`).join(' ');
+
+      // pakpok API 호출
+      try {
+        const res = await fetch('/api/pakpok', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name, mbti, bazi: baziStr, oheng: ohengStr, trust,
+            gua: `${guaName} — ${guaMeaning}`,
+            tarot: `${t1} / ${t2} / ${t3}`,
+          }),
+        });
+        const data = await res.json();
+        const text = data.result || '오늘의 운세를 가져오지 못했습니다.';
+
+        document.getElementById('verdictText').textContent = text;
+
+        // Firestore 캐싱
+        db.collection('pakpok').doc(`${user.uid}_${today}`).set({
+          result: text,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
+      } catch(e) {
+        document.getElementById('verdictText').textContent = '일시적인 오류가 발생했습니다.';
+      }
+    }
+
     // =====================
     // 사주 자세히 보기 토글
     // 클릭 시 Claude API 호출 예정
