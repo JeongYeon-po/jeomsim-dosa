@@ -412,29 +412,51 @@
 
       if (!detailLoaded) {
         detailLoaded = true;
-        // 나중에 Claude API 연결 예정
-        // 지금은 가상 분석 텍스트 표시
-        setTimeout(() => {
-          const baziStr = baziData
-            ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji}`
-            : '사주 데이터 없음';
 
+        // 사주 데이터 문자열 만들기
+        const baziStr = baziData
+          ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
+          : '사주 데이터 없음';
+
+        // 오행 분포 문자열
+        const ohengStr = baziData
+          ? (() => {
+              const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+              const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+              const cnt = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+              [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
+                if (p && 천간오행[p.gan]) cnt[천간오행[p.gan]]++;
+                if (p && 지지오행[p.ji])  cnt[지지오행[p.ji]]++;
+              });
+              return Object.entries(cnt).map(([k,v]) => `${k}${v}`).join(' ');
+            })()
+          : '';
+
+        // Gemini API 호출
+        fetch('/api/fortune', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            mbti,
+            bazi:   baziStr,
+            oheng:  ohengStr,
+            trust,
+            gender,
+            year,
+          }),
+        })
+        .then(res => res.json())
+        .then(data => {
           document.getElementById('detailLoading').style.display = 'none';
-          document.getElementById('detailText').style.display = 'block';
-          document.getElementById('detailText').textContent =
-`[ ${name}님의 사주 종합 분석 ]
-
-사주: ${baziStr}
-MBTI: ${mbti}
-
-※ Claude AI 심층 분석은 다음 업데이트에서 연결됩니다.
-현재는 만세력 계산 데이터만 표시됩니다.
-
-일주(日柱) ${baziData ? baziData.day.gan + baziData.day.ji : '?'} 기준으로
-${mbti} 유형과 결합하면 독특한 에너지 패턴이 나타납니다.
-
-곧 AI가 직접 분석해드릴 예정입니다. 🔮`;
-        }, 1200);
+          document.getElementById('detailText').style.display    = 'block';
+          document.getElementById('detailText').textContent = data.result || '분석 결과를 가져오지 못했습니다.';
+        })
+        .catch(() => {
+          document.getElementById('detailLoading').style.display = 'none';
+          document.getElementById('detailText').style.display    = 'block';
+          document.getElementById('detailText').textContent = '일시적인 오류가 발생했습니다. 다시 시도해주세요.';
+        });
       }
     }
 
