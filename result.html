@@ -353,6 +353,21 @@
         `).join('');
 
     }, 1800);
-  </script>
+ <script>
+  // 만세력 테스트 — 확인 후 삭제할 코드
+  window.onload = function() {
+    try {
+      const solar = Solar.fromYmd(1990, 3, 15);
+      const lunar = solar.getLunar();
+      const bazi  = lunar.getEightChar();
+      console.log('년주:', bazi.getYear());
+      console.log('월주:', bazi.getMonth());
+      console.log('일주:', bazi.getDay());
+      console.log('만세력 정상 작동!');
+    } catch(e) {
+      console.log('에러:', e);
+    }
+  }
+</script>
 </body>
 </html>
