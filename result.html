@@ -230,6 +230,23 @@
   </div>
 
   <script>
+     // =====================
+    // Firebase 초기화
+    // =====================
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCjQKd5pMPzgch3hEZxoDJEiJeY7cbkiFs",
+      authDomain:        "jeomsim-dosa.firebaseapp.com",
+      projectId:         "jeomsim-dosa",
+      storageBucket:     "jeomsim-dosa.firebasestorage.app",
+      messagingSenderId: "1059582361092",
+      appId:             "1:1059582361092:web:93c16966ee02bda9d8ff51",
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
     // =====================
     // URL 파라미터
     // =====================
