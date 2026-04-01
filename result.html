@@ -17,7 +17,6 @@
     }
     .wrap { max-width: 480px; margin: 0 auto; padding: 40px 20px 80px; }
 
-    /* 헤더 */
     .header { text-align: center; margin-bottom: 40px; }
     .badge { font-size: 11px; letter-spacing: 3px; color: #a0845c; text-transform: uppercase; margin-bottom: 10px; }
     .user-name { font-size: 24px; font-weight: 300; margin-bottom: 4px; }
@@ -25,30 +24,37 @@
     .user-meta { font-size: 12px; color: #444; letter-spacing: 1px; }
     .mode-badge { display: inline-block; font-size: 11px; padding: 4px 12px; border: 1px solid #2a2a2a; border-radius: 20px; color: #a0845c; margin-top: 10px; }
 
-    /* 메인 팩폭 */
-    .verdict-card { background: #111; border: 1px solid #c9a96e33; border-radius: 8px; padding: 28px 24px; margin-bottom: 16px; text-align: center; }
+    /* 사주 기둥 표시 */
+    .bazi-card { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 20px 22px; margin-bottom: 14px; }
+    .bazi-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+    .bazi-pillar { flex: 1; text-align: center; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 10px 6px; }
+    .bazi-pillar.highlight { border-color: #c9a96e44; background: #1e1810; }
+    .bazi-gan { font-size: 18px; font-weight: 500; color: #c9a96e; margin-bottom: 4px; }
+    .bazi-ji { font-size: 16px; color: #888; margin-bottom: 4px; }
+    .bazi-label { font-size: 10px; color: #444; letter-spacing: 1px; }
+    .oheng-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .oheng-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid #2a2a2a; color: #888; }
+    .oheng-badge.strong { border-color: #c9a96e; color: #c9a96e; background: #1e1810; }
+
+    .verdict-card { background: #111; border: 1px solid #c9a96e33; border-radius: 8px; padding: 28px 24px; margin-bottom: 14px; text-align: center; }
     .verdict-text { font-size: 16px; color: #d4b896; line-height: 1.9; margin-bottom: 14px; }
     .verdict-sign { font-size: 11px; color: #333; letter-spacing: 2px; }
 
-    /* 공통 카드 */
     .card { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 22px; margin-bottom: 14px; }
     .card-label { font-size: 10px; letter-spacing: 2px; color: #a0845c; text-transform: uppercase; margin-bottom: 14px; }
 
-    /* 점수 바 */
     .score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
     .score-label { font-size: 12px; color: #555; width: 36px; flex-shrink: 0; }
     .score-bar-bg { flex: 1; background: #1a1a1a; border-radius: 2px; height: 3px; }
     .score-bar { height: 100%; background: #c9a96e; border-radius: 2px; width: 0%; transition: width 1.2s ease; }
     .score-num { font-size: 12px; color: #a0845c; width: 28px; text-align: right; }
 
-    /* 점괘 */
     .gua-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
     .gua-symbol { font-size: 40px; line-height: 1; flex-shrink: 0; }
     .gua-name { font-size: 15px; font-weight: 500; color: #c9a96e; margin-bottom: 3px; }
     .gua-keyword { font-size: 11px; color: #555; letter-spacing: 1px; }
     .gua-meaning { font-size: 13px; color: #666; line-height: 1.7; }
 
-    /* 타로 */
     .tarot-item { padding: 14px 0; border-bottom: 1px solid #1a1a1a; }
     .tarot-item:last-child { border-bottom: none; padding-bottom: 0; }
     .tarot-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
@@ -57,21 +63,29 @@
     .tarot-sub { font-size: 11px; color: #444; }
     .tarot-meaning { font-size: 12px; color: #666; line-height: 1.7; }
 
-    /* 결핍 배너 */
+    /* 사주 자세히 보기 */
+    .detail-section { margin-bottom: 14px; }
+    .detail-toggle { width: 100%; padding: 16px 22px; background: #111; border: 1px solid #c9a96e33; border-radius: 8px; color: #c9a96e; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; letter-spacing: 1px; }
+    .detail-toggle:hover { background: #1a1208; }
+    .detail-toggle .arrow { transition: transform 0.3s; }
+    .detail-toggle.open .arrow { transform: rotate(180deg); }
+    .detail-content { display: none; background: #0d0d0d; border: 1px solid #1e1e1e; border-top: none; border-radius: 0 0 8px 8px; padding: 22px; }
+    .detail-content.open { display: block; }
+    .detail-loading { text-align: center; padding: 20px; font-size: 13px; color: #a0845c; animation: blink 1.5s infinite; }
+    .detail-text { font-size: 14px; color: #888; line-height: 1.9; white-space: pre-wrap; }
+
     .missing-banner { background: #140f05; border: 1px solid #c9a96e55; border-radius: 8px; padding: 20px 22px; margin-bottom: 14px; }
     .missing-title { font-size: 13px; color: #c9a96e; font-weight: 500; margin-bottom: 8px; }
     .missing-desc { font-size: 12px; color: #555; line-height: 1.7; margin-bottom: 14px; }
-    .missing-btn { width: 100%; padding: 12px; background: #c9a96e; color: #0d0d0d; border: none; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 1px; transition: background 0.2s; }
+    .missing-btn { width: 100%; padding: 12px; background: #c9a96e; color: #0d0d0d; border: none; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
     .missing-btn:hover { background: #b8956a; }
 
-    /* 음식 */
     .food-item { display: flex; gap: 14px; padding: 11px 0; border-bottom: 1px solid #1a1a1a; }
     .food-item:last-child { border-bottom: none; }
     .food-rank { font-size: 11px; color: #a0845c; width: 18px; flex-shrink: 0; padding-top: 2px; }
     .food-name { font-size: 14px; font-weight: 500; color: #f5f0e8; margin-bottom: 3px; }
     .food-reason { font-size: 12px; color: #555; line-height: 1.6; }
 
-    /* 피드백 */
     .feedback-card { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 20px 22px; margin-bottom: 14px; text-align: center; }
     .feedback-title { font-size: 13px; color: #666; margin-bottom: 4px; }
     .feedback-sub { font-size: 11px; color: #333; margin-bottom: 16px; }
@@ -81,11 +95,9 @@
     .fb-btn.yes { background: #0d2010; border-color: #2d6a3f; color: #5DCAA5; }
     .fb-btn.no { background: #200d0d; border-color: #6a2d2d; color: #E24B4A; }
 
-    /* 다시하기 */
     .retry-btn { width: 100%; padding: 15px; background: transparent; border: 1px solid #1e1e1e; color: #444; font-size: 13px; cursor: pointer; border-radius: 4px; margin-top: 6px; transition: all 0.2s; letter-spacing: 1px; }
     .retry-btn:hover { border-color: #a0845c; color: #a0845c; }
 
-    /* 로딩 */
     #loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; gap: 14px; }
     .loading-main { font-size: 14px; color: #a0845c; letter-spacing: 2px; animation: blink 1.5s ease-in-out infinite; }
     .loading-step { font-size: 12px; color: #2a2a2a; letter-spacing: 1px; }
@@ -95,17 +107,14 @@
 </head>
 <body>
 
-  <!-- 로딩 화면 -->
   <div id="loading">
     <div class="loading-main">도사가 천기를 읽는 중...</div>
-    <div class="loading-step" id="loadingStep">점괘를 뽑고 있습니다</div>
+    <div class="loading-step" id="loadingStep">사주를 계산하고 있습니다</div>
   </div>
 
-  <!-- 결과 화면 -->
   <div id="result">
     <div class="wrap">
 
-      <!-- 헤더 -->
       <div class="header">
         <div class="badge">오늘의 점(占)심(心)</div>
         <div class="user-name" id="userName">홍길동<span>님</span></div>
@@ -113,10 +122,29 @@
         <div class="mode-badge" id="modeBadge">⚖️ 밸런스 모드</div>
       </div>
 
+      <!-- 사주 4기둥 -->
+      <div class="bazi-card">
+        <div class="card-label">내 사주팔자</div>
+        <div class="bazi-row" id="baziRow"></div>
+        <div class="oheng-row" id="ohengRow"></div>
+      </div>
+
       <!-- 메인 팩폭 -->
       <div class="verdict-card">
         <div class="verdict-text" id="verdictText"></div>
         <div class="verdict-sign">— 점심도사 왈</div>
+      </div>
+
+      <!-- 사주 자세히 알아보기 -->
+      <div class="detail-section">
+        <button class="detail-toggle" id="detailToggle" onclick="toggleDetail()">
+          <span>🔮 내 사주 자세히 알아보기</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="detail-content" id="detailContent">
+          <div class="detail-loading" id="detailLoading">도사가 분석 중입니다...</div>
+          <div class="detail-text" id="detailText" style="display:none"></div>
+        </div>
       </div>
 
       <!-- 운세 점수 -->
@@ -170,26 +198,20 @@
         <div class="tarot-item" id="tarot3"></div>
       </div>
 
-      <!-- 결핍 배너 — 태어난 시 모를 때만 표시 -->
+      <!-- 결핍 배너 -->
       <div class="missing-banner" id="missingBanner" style="display:none">
         <div class="missing-title">⚠️ 정확한 풀이를 위해 하나의 기둥이 부족합니다</div>
-        <div class="missing-desc">
-          사주는 년·월·일·시 네 기둥으로 완성됩니다.<br>
-          태어난 시를 모르면 운세의 25%가 빠진 채로 분석됩니다.<br><br>
-          몇 가지 질문으로 태어난 시를 역추론해드릴 수 있습니다.
-        </div>
-        <button class="missing-btn" onclick="alert('태어난 시 역추론 — 다음 업데이트에서 오픈됩니다! 🔮')">
-          내 태어난 시 추론해보기 →
-        </button>
+        <div class="missing-desc">사주는 년·월·일·시 네 기둥으로 완성됩니다.<br>태어난 시를 모르면 운세의 25%가 빠진 채로 분석됩니다.<br><br>몇 가지 질문으로 태어난 시를 역추론해드릴 수 있습니다.</div>
+        <button class="missing-btn" onclick="alert('태어난 시 역추론 — 다음 업데이트에서 오픈됩니다! 🔮')">내 태어난 시 추론해보기 →</button>
       </div>
 
       <!-- 점심 추천 -->
       <div class="card">
-        <div class="card-label">오늘의 점심 추천</div>
+        <div class="card-label" id="foodLabel">오늘의 점심 추천</div>
         <div id="foodList"></div>
       </div>
 
-      <!-- 피드백 루프 -->
+      <!-- 피드백 -->
       <div class="feedback-card">
         <div class="feedback-title">오늘 도사의 말이 맞았나요?</div>
         <div class="feedback-sub">피드백이 쌓이면 나만의 적중률 스탯이 생깁니다</div>
@@ -206,41 +228,110 @@
 
   <script>
     // =====================
-    // URL 파라미터 파싱
+    // URL 파라미터
     // =====================
     const p = new URLSearchParams(window.location.search);
-    const name   = p.get('name')   || '도사';
-    const mbti   = p.get('mbti')   || 'INTJ';
-    const year   = p.get('year')   || '1990';
-    const gender = p.get('gender') === 'male' ? '남성' : '여성';
-    const trust  = parseInt(p.get('trust') || '2');
-    const hour   = p.get('hour')   || 'unknown';
+    const name     = p.get('name')   || '도사';
+    const mbti     = p.get('mbti')   || 'INTJ';
+    const year     = parseInt(p.get('year')  || '1990');
+    const month    = parseInt(p.get('month') || '1');
+    const day      = parseInt(p.get('day')   || '1');
+    const gender   = p.get('gender') === 'male' ? '남성' : '여성';
+    const trust    = parseInt(p.get('trust') || '2');
+    const hour     = p.get('hour')   || 'unknown';
+    const calType  = p.get('calType')|| 'solar';
 
     // =====================
-    // 시드 기반 난수
-    // 같은 사람 + 같은 날 = 같은 결과
+    // 만세력으로 사주 계산
+    // =====================
+    let baziData = null;
+    let 오늘오행 = '수';
+
+    try {
+      // 양력/음력 처리
+      let solar;
+      if (calType === 'lunar') {
+        const lunar = Lunar.fromYmd(year, month, day);
+        solar = lunar.getSolar();
+      } else {
+        solar = Solar.fromYmd(year, month, day);
+      }
+
+      const lunar = solar.getLunar();
+      const bazi  = lunar.getEightChar();
+
+      // 사주 천간지지 추출
+      baziData = {
+        year:  { gan: bazi.getYear()[0],  ji: bazi.getYear()[1]  },
+        month: { gan: bazi.getMonth()[0], ji: bazi.getMonth()[1] },
+        day:   { gan: bazi.getDay()[0],   ji: bazi.getDay()[1]   },
+        hour:  hour !== 'unknown' ? { gan: '?', ji: hour[0] } : null,
+      };
+
+      // 오행 카운트
+      const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+      const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+      const 오행카운트 = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+
+      [baziData.year, baziData.month, baziData.day].forEach(p => {
+        if (천간오행[p.gan]) 오행카운트[천간오행[p.gan]]++;
+        if (지지오행[p.ji])  오행카운트[지지오행[p.ji]]++;
+      });
+
+      // 가장 부족한 오행 → 점심 추천
+      const 최소오행 = Object.entries(오행카운트).sort((a,b) => a[1]-b[1])[0][0];
+      오늘오행 = 최소오행;
+
+    } catch(e) {
+      console.log('만세력 오류:', e);
+    }
+
+    // =====================
+    // 시드 난수
     // =====================
     function rand(seed, max) {
       const today = new Date().toDateString();
       let h = 0;
-      for (const c of (today + name + seed)) {
-        h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
-      }
+      for (const c of (today + name + seed)) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
       return Math.abs(h) % max;
     }
 
-    function score(seed) {
-      return Math.max(33, Math.min(96, 40 + rand(seed, 56)));
+    function score(seed, base) {
+      return Math.max(33, Math.min(96, (base || 50) + rand(seed, 30) - 15));
+    }
+
+    // =====================
+    // 오행 기반 점수 보정
+    // =====================
+    function getScores() {
+      const 오행점수 = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+      if (baziData) {
+        const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+        const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+        const today = new Date();
+        try {
+          const todaySolar = Solar.fromDate(today);
+          const todayLunar = todaySolar.getLunar();
+          const todayBazi  = todayLunar.getEightChar();
+          const todayGan = todayBazi.getDay()[0];
+          const todayJi  = todayBazi.getDay()[1];
+          if (천간오행[todayGan]) 오행점수[천간오행[todayGan]] += 10;
+          if (지지오행[todayJi])  오행점수[지지오행[todayJi]]  += 10;
+        } catch(e) {}
+      }
+      return {
+        overall: score('overall', 55),
+        money:   score('money',   50 + (오행점수['금'] || 0)),
+        love:    score('love',    50 + (오행점수['화'] || 0)),
+        work:    score('work',    50 + (오행점수['토'] || 0)),
+        health:  score('health',  50 + (오행점수['수'] || 0)),
+      };
     }
 
     // =====================
     // 신뢰도별 텍스트
     // =====================
-    const MODES = [
-      '🔬 완전 과학 모드','📊 데이터 우선 모드','⚖️ 밸런스 모드',
-      '🌙 운세 참고 모드','🔮 신비 모드','🌟 완전 신비 모드'
-    ];
-
+    const MODES = ['🔬 완전 과학 모드','📊 데이터 우선 모드','⚖️ 밸런스 모드','🌙 운세 참고 모드','🔮 신비 모드','🌟 완전 신비 모드'];
     const VERDICTS = [
       `${mbti} 유형 분석 결과, 오늘은 인지 부하가 높은 상태입니다. 의사결정을 최소화하고 루틴에 집중하세요.`,
       `데이터 패턴상 오늘은 새로운 시도보다 검증된 방식이 유리합니다. 사주 흐름도 같은 방향을 가리키고 있어요.`,
@@ -251,7 +342,7 @@
     ];
 
     // =====================
-    // 타로 카드 HTML
+    // 타로 HTML
     // =====================
     function tarotHTML(card, label, dir) {
       return `
@@ -262,32 +353,71 @@
             <div class="tarot-sub">${label} · ${dir}</div>
           </div>
         </div>
-        <div class="tarot-meaning">${dir === '역방향' ? '(역방향) ' : ''}${card.meaning}</div>
+        <div class="tarot-meaning">${dir==='역방향'?'(역방향) ':''}${card.meaning}</div>
       `;
+    }
+
+    // =====================
+    // 사주 자세히 보기 토글
+    // 클릭 시 Claude API 호출 예정
+    // =====================
+    let detailLoaded = false;
+    function toggleDetail() {
+      const toggle  = document.getElementById('detailToggle');
+      const content = document.getElementById('detailContent');
+      toggle.classList.toggle('open');
+      content.classList.toggle('open');
+
+      if (!detailLoaded) {
+        detailLoaded = true;
+        // 나중에 Claude API 연결 예정
+        // 지금은 가상 분석 텍스트 표시
+        setTimeout(() => {
+          const baziStr = baziData
+            ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji}`
+            : '사주 데이터 없음';
+
+          document.getElementById('detailLoading').style.display = 'none';
+          document.getElementById('detailText').style.display = 'block';
+          document.getElementById('detailText').textContent =
+`[ ${name}님의 사주 종합 분석 ]
+
+사주: ${baziStr}
+MBTI: ${mbti}
+
+※ Claude AI 심층 분석은 다음 업데이트에서 연결됩니다.
+현재는 만세력 계산 데이터만 표시됩니다.
+
+일주(日柱) ${baziData ? baziData.day.gan + baziData.day.ji : '?'} 기준으로
+${mbti} 유형과 결합하면 독특한 에너지 패턴이 나타납니다.
+
+곧 AI가 직접 분석해드릴 예정입니다. 🔮`;
+        }, 1200);
+      }
     }
 
     // =====================
     // 피드백
     // =====================
     function feedback(ans) {
-      document.getElementById('btnYes').className = 'fb-btn' + (ans==='yes' ? ' yes' : '');
-      document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no'  ? ' no'  : '');
-      console.log('피드백:', ans); // 나중에 Firebase 저장 예정
+      document.getElementById('btnYes').className = 'fb-btn' + (ans==='yes'?' yes':'');
+      document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no' ?' no' :'');
+      console.log('피드백:', ans);
     }
 
     // =====================
-    // 로딩 스텝 애니메이션
+    // 로딩 스텝
     // =====================
-    const steps = ['점괘를 뽑고 있습니다','타로를 펼치는 중입니다','사주를 분석하고 있습니다','운세를 정리하고 있습니다'];
+    const steps = ['사주를 계산하고 있습니다','점괘를 뽑고 있습니다','타로를 펼치는 중입니다','운세를 정리하고 있습니다'];
     let si = 0;
     const timer = setInterval(() => {
-      si = (si + 1) % steps.length;
+      si = (si+1) % steps.length;
       const el = document.getElementById('loadingStep');
       if (el) el.textContent = steps[si];
     }, 550);
 
     // =====================
-    // 결과 렌더링 (1.8초 후)
+    // 렌더링
     // =====================
     setTimeout(() => {
       clearInterval(timer);
@@ -295,16 +425,48 @@
       document.getElementById('result').style.display  = 'block';
 
       // 헤더
-      document.getElementById('userName').innerHTML = `${name}<span>님</span>`;
+      document.getElementById('userName').innerHTML   = `${name}<span>님</span>`;
       document.getElementById('userMeta').textContent = `${mbti} · ${year}년생 · ${gender}`;
       document.getElementById('modeBadge').textContent = MODES[trust];
       document.getElementById('verdictText').textContent = `"${VERDICTS[trust]}"`;
 
-      // 점수 (300ms 딜레이로 바 애니메이션)
+      // 사주 4기둥 표시
+      if (baziData) {
+        const pillars = [
+          { label:'년주', ...baziData.year },
+          { label:'월주', ...baziData.month },
+          { label:'일주', ...baziData.day, highlight: true },
+          { label:'시주', gan: baziData.hour ? baziData.hour.gan : '?', ji: hour !== 'unknown' ? hour[0] : '?' },
+        ];
+        document.getElementById('baziRow').innerHTML = pillars.map(p => `
+          <div class="bazi-pillar ${p.highlight?'highlight':''}">
+            <div class="bazi-gan">${p.gan}</div>
+            <div class="bazi-ji">${p.ji}</div>
+            <div class="bazi-label">${p.label}</div>
+          </div>
+        `).join('');
+
+        // 오행 뱃지
+        const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+        const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+        const cnt = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+        [baziData.year, baziData.month, baziData.day].forEach(p => {
+          if (천간오행[p.gan]) cnt[천간오행[p.gan]]++;
+          if (지지오행[p.ji])  cnt[지지오행[p.ji]]++;
+        });
+        const max = Math.max(...Object.values(cnt));
+        document.getElementById('ohengRow').innerHTML = Object.entries(cnt).map(([k,v]) => `
+          <div class="oheng-badge ${v===max?'strong':''}">
+            ${k} ${v}
+          </div>
+        `).join('');
+      }
+
+      // 점수
+      const scores = getScores();
       setTimeout(() => {
-        [['overall','전체'],['money','재물'],['love','연애'],['work','직장'],['health','건강']].forEach(([k]) => {
-          const v = score(k);
-          document.getElementById(`s-${k}`).style.width = v + '%';
+        Object.entries(scores).forEach(([k,v]) => {
+          document.getElementById(`s-${k}`).style.width = v+'%';
           document.getElementById(`n-${k}`).textContent = v;
         });
       }, 300);
@@ -313,61 +475,39 @@
       const gua = GUA[rand('gua', GUA.length)];
       document.getElementById('guaSymbol').textContent  = gua.symbol;
       document.getElementById('guaName').textContent    = gua.name;
-      document.getElementById('guaKeyword').textContent = gua.num + ' · ' + gua.keyword;
+      document.getElementById('guaKeyword').textContent = gua.num+' · '+gua.keyword;
       document.getElementById('guaMeaning').textContent = gua.meaning;
 
-    // 메이저 아르카나 22장만 사용
+      // 타로 3장
       const MAJOR = TAROT.slice(0, 22);
-
-      // 3장 중복 없이 뽑기
       const i1 = rand('t1', 22);
       let   i2 = rand('t2', 22);
       let   i3 = rand('t3', 22);
-      if (i2 === i1) i2 = (i2 + 1) % 22;
-      if (i3 === i1 || i3 === i2) i3 = (i3 + 2) % 22;
+      if (i2===i1) i2=(i2+1)%22;
+      if (i3===i1||i3===i2) i3=(i3+2)%22;
+      const d1 = rand('d1',2)===0?'정방향':'역방향';
+      const d2 = rand('d2',2)===0?'정방향':'역방향';
+      const d3 = rand('d3',2)===0?'정방향':'역방향';
+      document.getElementById('tarot1').innerHTML = tarotHTML(MAJOR[i1],'과거',d1);
+      document.getElementById('tarot2').innerHTML = tarotHTML(MAJOR[i2],'현재',d2);
+      document.getElementById('tarot3').innerHTML = tarotHTML(MAJOR[i3],'미래',d3);
 
-      const d1 = rand('d1', 2) === 0 ? '정방향' : '역방향';
-      const d2 = rand('d2', 2) === 0 ? '정방향' : '역방향';
-      const d3 = rand('d3', 2) === 0 ? '정방향' : '역방향';
+      // 결핍 배너
+      if (hour==='unknown') document.getElementById('missingBanner').style.display='block';
 
-      document.getElementById('tarot1').innerHTML = tarotHTML(MAJOR[i1], '과거', d1);
-      document.getElementById('tarot2').innerHTML = tarotHTML(MAJOR[i2], '현재', d2);
-      document.getElementById('tarot3').innerHTML = tarotHTML(MAJOR[i3], '미래', d3);
-
-      // 결핍 배너 (태어난 시 모를 때)
-      if (hour === 'unknown') {
-        document.getElementById('missingBanner').style.display = 'block';
-      }
-
-      // 점심 추천
-      const 오늘오행 = 오행목록[rand('food', 5)];
-      document.getElementById('foodList').innerHTML =
-        FOODS[오늘오행].map((f, i) => `
-          <div class="food-item">
-            <div class="food-rank">0${i+1}</div>
-            <div>
-              <div class="food-name">${f.name}</div>
-              <div class="food-reason">${f.reason}</div>
-            </div>
+      // 점심 추천 (부족한 오행 기반)
+      document.getElementById('foodLabel').textContent = `오늘의 점심 추천 — ${오늘오행}(${{'목':'木','화':'火','토':'土','금':'金','수':'水'}[오늘오행]}) 기운 보충`;
+      document.getElementById('foodList').innerHTML = FOODS[오늘오행].map((f,i) => `
+        <div class="food-item">
+          <div class="food-rank">0${i+1}</div>
+          <div>
+            <div class="food-name">${f.name}</div>
+            <div class="food-reason">${f.reason}</div>
           </div>
-        `).join('');
+        </div>
+      `).join('');
 
     }, 1800);
-
-  // 만세력 테스트 — 확인 후 삭제할 코드
-  window.onload = function() {
-    try {
-      const solar = Solar.fromYmd(1990, 3, 15);
-      const lunar = solar.getLunar();
-      const bazi  = lunar.getEightChar();
-      console.log('년주:', bazi.getYear());
-      console.log('월주:', bazi.getMonth());
-      console.log('일주:', bazi.getDay());
-      console.log('만세력 정상 작동!');
-    } catch(e) {
-      console.log('에러:', e);
-    }
-  }
-</script>
+  </script>
 </body>
 </html>
