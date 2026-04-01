@@ -424,7 +424,7 @@
     // 클릭 시 Claude API 호출 예정
     // =====================
     let detailLoaded = false;
-    function toggleDetail() {
+    async function toggleDetail() {
       const toggle  = document.getElementById('detailToggle');
       const content = document.getElementById('detailContent');
       toggle.classList.toggle('open');
@@ -432,6 +432,21 @@
 
       if (!detailLoaded) {
         detailLoaded = true;
+         // 로그인 유저 확인 + 캐시 체크
+        const user = auth.currentUser;
+        const today = new Date().toISOString().slice(0, 10);
+
+        if (user) {
+          const cacheRef = db.collection('fortunes').doc(`${user.uid}_${today}`);
+          const cached = await cacheRef.get();
+          if (cached.exists) {
+            console.log('캐시 히트! API 호출 안 함');
+            document.getElementById('detailLoading').style.display = 'none';
+            document.getElementById('detailText').style.display    = 'block';
+            document.getElementById('detailText').textContent = cached.data().result;
+            return;
+          }
+        }
 
         // 사주 데이터 문자열 만들기
         const baziStr = baziData
