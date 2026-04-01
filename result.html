@@ -486,6 +486,16 @@
           document.getElementById('detailLoading').style.display = 'none';
           document.getElementById('detailText').style.display    = 'block';
           document.getElementById('detailText').textContent = data.result || '분석 결과를 가져오지 못했습니다.';
+          // 로그인 유저면 Firestore에 저장
+          if (user) {
+            db.collection('fortunes').doc(`${user.uid}_${today}`).set({
+              result: data.result,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              mbti,
+              year,
+            });
+            console.log('Firestore 저장 완료!');
+          }
         })
         .catch(() => {
           document.getElementById('detailLoading').style.display = 'none';
