@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 오늘 날짜 기운과 이 사람의 사주가 만나는 지점.
 딱 한 가지만 날카롭게.
 
-전체 1000자 내외로 작성.`;
+전체 1500~2000자로 충분히 작성. 절대 중간에 끊지 말고 5번 항목까지 반드시 완성해줘. 각 항목당 최소 5~6문장 이상.`;
 
     const apiKey = process.env.JSDS_CLAUDE;
     console.log('API 키 존재 여부:', apiKey ? '있음' : '없음');
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
+        max_tokens: 2500,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
