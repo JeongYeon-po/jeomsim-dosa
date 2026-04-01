@@ -261,11 +261,53 @@
       const bazi  = lunar.getEightChar();
 
       // 사주 천간지지 추출
+      // 사주 천간지지 추출
+      const yearGan  = bazi.getYear()[0];
+      const yearJi   = bazi.getYear()[1];
+      const monthGan = bazi.getMonth()[0];
+      const monthJi  = bazi.getMonth()[1];
+      const dayGan   = bazi.getDay()[0];
+      const dayJi    = bazi.getDay()[1];
+
+      // 시주 천간 계산 (일간기두법)
+      // 일주 천간에 따라 시주 천간 고정 공식
+      const 시주천간표 = {
+        '甲': ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸','庚','辛'],
+        '己': ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸','庚','辛'],
+        '乙': ['丙','丁','戊','己','庚','辛','壬','癸','甲','乙','壬','癸'],
+        '庚': ['丙','丁','戊','己','庚','辛','壬','癸','甲','乙','壬','癸'],
+        '丙': ['戊','己','庚','辛','壬','癸','甲','乙','丙','丁','甲','乙'],
+        '辛': ['戊','己','庚','辛','壬','癸','甲','乙','丙','丁','甲','乙'],
+        '丁': ['庚','辛','壬','癸','甲','乙','丙','丁','戊','己','丙','丁'],
+        '壬': ['庚','辛','壬','癸','甲','乙','丙','丁','戊','己','丙','丁'],
+        '戊': ['壬','癸','甲','乙','丙','丁','戊','己','庚','辛','戊','己'],
+        '癸': ['壬','癸','甲','乙','丙','丁','戊','己','庚','辛','戊','己'],
+      };
+
+      // 시진 → 인덱스 변환
+      const 시진인덱스 = {
+        '자시':0,'축시':1,'인시':2,'묘시':3,
+        '진시':4,'사시':5,'오시':6,'미시':7,
+        '신시':8,'유시':9,'술시':10,'해시':11,
+      };
+
+      let hourGan = '?';
+      let hourJi  = '?';
+
+      if (hour !== 'unknown') {
+        const idx = 시진인덱스[hour];
+        const 지지목록 = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+        if (idx !== undefined && 시주천간표[dayGan]) {
+          hourGan = 시주천간표[dayGan][idx];
+          hourJi  = 지지목록[idx];
+        }
+      }
+
       baziData = {
-        year:  { gan: bazi.getYear()[0],  ji: bazi.getYear()[1]  },
-        month: { gan: bazi.getMonth()[0], ji: bazi.getMonth()[1] },
-        day:   { gan: bazi.getDay()[0],   ji: bazi.getDay()[1]   },
-        hour:  hour !== 'unknown' ? { gan: '?', ji: hour[0] } : null,
+        year:  { gan: yearGan,  ji: yearJi  },
+        month: { gan: monthGan, ji: monthJi },
+        day:   { gan: dayGan,   ji: dayJi   },
+        hour:  { gan: hourGan,  ji: hourJi  },
       };
 
       // 오행 카운트
