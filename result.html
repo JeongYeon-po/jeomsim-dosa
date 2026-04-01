@@ -533,9 +533,19 @@
 
       if (!detailLoaded) {
         detailLoaded = true;
+        
          // 로그인 유저 확인 + 캐시 체크
         const user = auth.currentUser;
         const today = new Date().toISOString().slice(0, 10);
+        // 비로그인이면 차단
+        
+        if (!user) {
+          document.getElementById('detailLoading').style.display = 'none';
+          document.getElementById('detailText').style.display = 'block';
+          document.getElementById('detailText').textContent =
+            '🔒 구글 로그인 후 이용할 수 있는 기능입니다.\n첫 화면으로 돌아가서 로그인해주세요.';
+          return;
+        }
 
         if (user) {
           const cacheRef = db.collection('fortunes').doc(`${user.uid}_${today}`);
