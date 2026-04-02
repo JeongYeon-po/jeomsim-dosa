@@ -661,6 +661,23 @@ const query = new URLSearchParams({
   month: formData.month,
   day: formData.day,
 }).toString();
+     // Firestore에 유저 데이터 저장
+      const user = auth.currentUser;
+      if (user) {
+        db.collection('users').doc(user.uid).set({
+          name:      formData.name,
+          mbti:      formData.mbti,
+          year:      formData.year,
+          month:     formData.month,
+          day:       formData.day,
+          hour:      formData.hour,
+          gender:    formData.gender,
+          trust:     formData.trustLevel,
+          calType:   formData.calType,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log('유저 데이터 저장 완료!');
+      }
 location.href = `result.html?${query}`;
     }
 
