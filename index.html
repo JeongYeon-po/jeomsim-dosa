@@ -706,12 +706,88 @@ location.href = `result.html?${query}`;
         });
     }
 
-    // 로그인 상태 감지
-    auth.onAuthStateChanged(user => {
+    // =====================
+    // 로그인 상태 감지 + 재방문 처리
+    // =====================
+    auth.onAuthStateChanged(async user => {
       if (user) {
         console.log('현재 로그인:', user.displayName);
+
+        // Firestore에서 기존 데이터 확인
+        const userRef = db.collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
+
+        if (userDoc.exists) {
+          // 재방문 유저 → 웰컴 멘트 + 바로 결과로
+          const data = userDoc.data();
+          showWelcome(user.displayName, data);
+        } else {
+          // 첫 방문 → 폼으로
+          showForm();
+        }
       }
     });
+
+    // =====================
+    // 웰컴 멘트 (신뢰도별 랜덤)
+    // =====================
+    function showWelcome(displayName, data) {
+      const name = data.name || displayName.split(' ')[0];
+      const trust = data.trust || 2;
+
+      constments = {
+        low: [
+          `돌아오셨군요, ${name}님. 오늘의 데이터를 분석합니다.`,
+          `재방문을 확인했습니다, ${name}님. 오늘 패턴은 어제와 다릅니다.`,
+          `${name}님의 바이오리듬이 오늘 흥미로운 구간에 있습니다.`,
+          `접속을 감지했습니다, ${name}님. 오늘 통계를 준비했습니다.`,
+          `데이터가 쌓이고 있습니다, ${name}님. 오늘도 분석 시작합니다.`,
+        ],
+        mid: [
+          `또 오셨군요, ${name}님. 오늘 기운은 어제와 다릅니다.`,
+          `반갑습니다, ${name}님. 오늘 사주 흐름을 확인해볼까요.`,
+          `돌아오셨군요, ${name}님. 오늘의 점괘가 기다리고 있습니다.`,
+          `${name}님, 오늘도 도사가 준비하고 있었습니다.`,
+          `어서 오세요, ${name}님. 오늘의 운세가 펼쳐집니다.`,
+        ],
+        high: [
+          `어제의 별자리를 보니 오늘 오실 줄 알았습니다, ${name}님.`,
+          `기다리고 있었습니다. 오늘 천기가 ${name}님을 향하고 있습니다.`,
+          `달이 바뀌었습니다, ${name}님. 오늘 기운은 심상치 않습니다.`,
+          `${name}님의 기운이 느껴졌습니다. 도사가 준비를 마쳤습니다.`,
+          `오늘 새벽 점괘에서 ${name}님이 보였습니다. 어서 오십시오.`,
+        ],
+      };
+
+      const pool = trust <= 1 ? 'low' : trust <= 3 ? 'mid' : 'high';
+      const list = ments[pool];
+      const ment = list[Math.floor(Math.random() * list.length)];
+
+      // 랜딩 페이지에 웰컴 멘트 표시
+      document.getElementById('landingPage').style.display = 'flex';
+      document.querySelector('.copy-main').textContent = ment;
+      document.querySelector('.copy-sub').textContent = '오늘의 운세를 확인하세요';
+      document.querySelector('.cta').textContent = '오늘 운세 보기 🔮';
+      document.querySelector('.cta').onclick = () => goToResult(data);
+    }
+
+    // =====================
+    // 재방문 유저 → 바로 결과로 이동
+    // =====================
+    function goToResult(data) {
+      const query = new URLSearchParams({
+        name:     data.name    || '',
+        mbti:     data.mbti    || '',
+        year:     data.year    || '',
+        month:    data.month   || '',
+        day:      data.day     || '',
+        hour:     data.hour    || 'unknown',
+        gender:   data.gender  || '',
+        trust:    data.trust   || '2',
+        calType:  data.calType || 'solar',
+      }).toString();
+      location.href = `result.html?${query}`;
+    }
   </script>
 </body>
 </html>
