@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>점(占)심(心)도사 — 로그인 중</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background: #0d0d0d;
+      color: #f5f0e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 16px;
+    }
+    .loading-text {
+      font-size: 14px;
+      color: #a0845c;
+      letter-spacing: 2px;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    .sub { font-size: 12px; color: #333; letter-spacing: 1px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  </style>
+</head>
+<body>
+  <div class="loading-text">도사가 확인하는 중...</div>
+  <div class="sub" id="statusText">카카오 로그인 처리 중입니다</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase 초기화 (index.html이랑 동일한 값)
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCjQKd5pMPzgch3hEZxoDJEiJeY7cbkiFs",
+      authDomain:        "jeomsim-dosa.firebaseapp.com",
+      projectId:         "jeomsim-dosa",
+      storageBucket:     "jeomsim-dosa.firebasestorage.app",
+      messagingSenderId: "1059582361092",
+      appId:             "1:1059582361092:web:93c16966ee02bda9d8ff51",
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    async function handleKakaoCallback() {
+      // URL에서 카카오 인가 코드 추출
+      const params = new URLSearchParams(window.location.search);
+      const code   = params.get('code');
+      const error  = params.get('error');
+
+      if (error || !code) {
+        document.getElementById('statusText').textContent = '로그인이 취소되었습니다.';
+        setTimeout(() => location.href = 'index.html', 2000);
+        return;
+      }
+
+      try {
+        document.getElementById('statusText').textContent = '카카오 인증 처리 중...';
+
+        // api/kakao.js 호출해서 유저 정보 받기
+        const res  = await fetch('/api/kakao', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ code }),
+        });
+        const data = await res.json();
+
+        if (!data.kakaoId) throw new Error('카카오 유저 정보 없음');
+
+        document.getElementById('statusText').textContent = `${data.nickname}님 확인 완료!`;
+
+        // Firestore에 카카오 유저 저장
+        const uid = `kakao_${data.kakaoId}`;
+        const userRef = db.collection('users').doc(uid);
+        const userDoc = await userRef.get();
+
+        if (userDoc.exists) {
+          // 재방문 → 웰컴 멘트 처리를 위해 세션 저장
+          sessionStorage.setItem('kakaoUser', JSON.stringify({
+            uid,
+            nickname: data.nickname,
+            isNew: false,
+          }));
+          location.href = 'index.html';
+        } else {
+          // 첫 방문 → 폼으로
+          sessionStorage.setItem('kakaoUser', JSON.stringify({
+            uid,
+            nickname: data.nickname,
+            isNew: true,
+          }));
+          location.href = 'index.html';
+        }
+
+      } catch (err) {
+        console.error('카카오 콜백 오류:', err);
+        document.getElementById('statusText').textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+        setTimeout(() => location.href = 'index.html', 2000);
+      }
+    }
+
+    handleKakaoCallback();
+  </script>
+</body>
+</html>
