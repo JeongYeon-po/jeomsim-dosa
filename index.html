@@ -726,7 +726,22 @@ location.href = `result.html?${query}`;
           showForm();
         });
     }
-
+// 카카오 유저 sessionStorage 확인
+const kakaoUser = sessionStorage.getItem('kakaoUser');
+if (kakaoUser) {
+  const data = JSON.parse(kakaoUser);
+  if (data.isNew) {
+    showForm();
+  } else {
+    // Firestore에서 기존 데이터 불러와서 웰컴 멘트
+    const userDoc = await db.collection('users').doc(data.uid).get();
+    if (userDoc.exists) {
+      showWelcome(data.nickname, userDoc.data());
+    } else {
+      showForm();
+    }
+  }
+}
     // =====================
     // 로그인 상태 감지 + 재방문 처리
     // =====================
