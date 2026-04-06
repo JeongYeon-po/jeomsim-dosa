@@ -726,6 +726,11 @@ location.href = `result.html?${query}`;
           showForm();
         });
     }
+     function kakaoLogin() {
+      const KAKAO_CLIENT_ID = '0383eddeb397e455a4399ec6c2390171';
+      const REDIRECT_URI = 'https://jeomsim-dosa.vercel.app/kakao-callback.html';
+      location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    }
 // 카카오 유저 sessionStorage 확인
 const kakaoUser = sessionStorage.getItem('kakaoUser');
 if (kakaoUser) {
