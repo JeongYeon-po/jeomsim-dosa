@@ -620,10 +620,18 @@
     // 피드백
     // =====================
     function feedback(ans) {
-      document.getElementById('btnYes').className = 'fb-btn' + (ans==='yes'?' yes':'');
-      document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no' ?' no' :'');
-      console.log('피드백:', ans);
-    }
+  document.getElementById('btnYes').className = 'fb-btn' + (ans==='yes' ? ' yes' : '');
+  document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no'  ? ' no'  : '');
+
+  const user = auth.currentUser;
+  if (!user) return; // 비로그인은 저장 안 함
+
+  const today = new Date().toISOString().slice(0, 10);
+  db.collection('feedback').doc(`${user.uid}_${today}`).set({
+    answer: ans,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+}
 
     // =====================
     // 로딩 스텝
