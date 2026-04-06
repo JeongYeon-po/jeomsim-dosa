@@ -731,22 +731,23 @@ location.href = `result.html?${query}`;
       const REDIRECT_URI = 'https://jeomsim-dosa.vercel.app/kakao-callback.html';
       location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     }
-// 카카오 유저 sessionStorage 확인
-const kakaoUser = sessionStorage.getItem('kakaoUser');
-if (kakaoUser) {
-  const data = JSON.parse(kakaoUser);
-  if (data.isNew) {
-    showForm();
-  } else {
-    // Firestore에서 기존 데이터 불러와서 웰컴 멘트
-    const userDoc = await db.collection('users').doc(data.uid).get();
-    if (userDoc.exists) {
-      showWelcome(data.nickname, userDoc.data());
-    } else {
+async function checkKakaoUser() {
+  const kakaoUser = sessionStorage.getItem('kakaoUser');
+  if (kakaoUser) {
+    const data = JSON.parse(kakaoUser);
+    if (data.isNew) {
       showForm();
+    } else {
+      const userDoc = await db.collection('users').doc(data.uid).get();
+      if (userDoc.exists) {
+        showWelcome(data.nickname, userDoc.data());
+      } else {
+        showForm();
+      }
     }
   }
 }
+checkKakaoUser();
     // =====================
     // 로그인 상태 감지 + 재방문 처리
     // =====================
