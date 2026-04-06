@@ -449,12 +449,14 @@
 
       // 로그인 유저 확인
       const user = auth.currentUser;
+      const kakaoUser = sessionStorage.getItem('kakaoUser');
+      const uid = user ? user.uid : (kakaoUser ? JSON.parse(kakaoUser).uid : null);
       const today = new Date().toISOString().slice(0, 10);
 
       // 캐시 확인
-      if (user) {
+      if (uid) {
         try {
-          const cacheRef = db.collection('pakpok').doc(`${user.uid}_${today}`);
+          const cacheRef = db.collection('pakpok').doc(`${uid}_${today}`);
           const cached = await cacheRef.get();
           if (cached.exists) {
             console.log('팩폭 캐시 히트!');
@@ -465,7 +467,7 @@
       }
 
       // 비로그인이면 로그인 유도
-      if (!user) {
+      if (!uid) {
         document.getElementById('verdictText').textContent =
           '로그인하면 사주·MBTI·점괘·타로를 종합한 AI 팩폭 한마디를 들을 수 있어요.';
         return;
@@ -510,7 +512,7 @@
         document.getElementById('verdictText').textContent = text;
 
         // Firestore 캐싱
-        db.collection('pakpok').doc(`${user.uid}_${today}`).set({
+        db.collection('pakpok').doc(`${uid}_${today}`).set({
           result: text,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
@@ -536,10 +538,12 @@
         
          // 로그인 유저 확인 + 캐시 체크
         const user = auth.currentUser;
+        const kakaoUser = sessionStorage.getItem('kakaoUser');
+        const uid = user ? user.uid : (kakaoUser ? JSON.parse(kakaoUser).uid : null);
         const today = new Date().toISOString().slice(0, 10);
         // 비로그인이면 차단
         
-        if (!user) {
+        if (!uid) {
           document.getElementById('detailLoading').style.display = 'none';
           document.getElementById('detailText').style.display = 'block';
           document.getElementById('detailText').textContent =
@@ -547,8 +551,8 @@
           return;
         }
 
-        if (user) {
-          const cacheRef = db.collection('fortunes').doc(`${user.uid}_${today}`);
+        if (uid) {
+          const cacheRef = db.collection('fortunes').doc(`${uid}_${today}`);
           const cached = await cacheRef.get();
           if (cached.exists) {
             console.log('캐시 히트! API 호출 안 함');
@@ -598,8 +602,8 @@
           document.getElementById('detailText').style.display    = 'block';
           document.getElementById('detailText').textContent = data.result || '분석 결과를 가져오지 못했습니다.';
           // 로그인 유저면 Firestore에 저장
-          if (user) {
-            db.collection('fortunes').doc(`${user.uid}_${today}`).set({
+          if (uid) {
+            db.collection('fortunes').doc(`${uid}_${today}`).set({
               result: data.result,
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               mbti,
@@ -624,10 +628,12 @@
   document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no'  ? ' no'  : '');
 
   const user = auth.currentUser;
-  if (!user) return; // 비로그인은 저장 안 함
+  const kakaoUser = sessionStorage.getItem('kakaoUser');
+  const uid = user ? user.uid : (kakaoUser ? JSON.parse(kakaoUser).uid : null);
+  if (!uid) return; // 비로그인은 저장 안 함
 
   const today = new Date().toISOString().slice(0, 10);
-  db.collection('feedback').doc(`${user.uid}_${today}`).set({
+  db.collection('feedback').doc(`${uid}_${today}`).set({
     answer: ans,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
   });
