@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: '허용되지 않는 메서드' });
 
   try {
-    const { name, mbti, bazi, oheng, trust, gender, year } = req.body;
+    const { name, mbti, bazi, oheng, trust, gender, year, question } = req.body;
 
     const toneMap = {
       0: '심리학과 통계 데이터 기반으로 냉철하고 과학적으로',
@@ -19,7 +19,30 @@ export default async function handler(req, res) {
     };
     const tone = toneMap[trust] || toneMap[2];
 
-    const prompt = `너는 사주팔자와 MBTI를 종합 분석하는 AI 도사야.
+    // 질문 모드 vs 사주 분석 모드 분기
+    const prompt = question
+      ? `너는 사주팔자와 MBTI를 종합 분석하는 AI 도사야.
+아래 정보를 바탕으로 ${tone} 질문에 답해줘.
+
+[ 질문자 정보 ]
+- 이름: ${name}
+- 성별: ${gender}
+- 출생년도: ${year}년
+- MBTI: ${mbti}
+- 사주팔자: ${bazi}
+- 오행 분포: ${oheng || ''}
+
+[ 질문 ]
+${question}
+
+[ 중요한 규칙 ]
+- 한자 단독 사용 금지. 반드시 한글 병기: 금(金), 화(火), 수(水), 목(木), 토(土)
+- ** # 같은 마크다운 기호 사용 금지
+- 말투는 ${tone} 스타일로
+- 이 사람의 사주와 MBTI를 반드시 답변에 녹여줘
+- 빈말 없이 핵심만. 300~500자 이내로 간결하게.`
+
+      : `너는 사주팔자와 MBTI를 종합 분석하는 AI 도사야.
 아래 정보를 바탕으로 ${tone} 분석해줘.
 
 [ 분석 대상 ]
@@ -64,8 +87,6 @@ export default async function handler(req, res) {
 전체 1500~2000자로 충분히 작성. 절대 중간에 끊지 말고 5번 항목까지 반드시 완성해줘. 각 항목당 최소 5~6문장 이상.`;
 
     const apiKey = process.env.JSDS_CLAUDE;
-    console.log('API 키 존재 여부:', apiKey ? '있음' : '없음');
-
     if (!apiKey) {
       return res.status(500).json({ error: 'API 키가 설정되지 않았습니다.' });
     }
@@ -79,19 +100,15 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2500,
+        max_tokens: question ? 1000 : 2500,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
     const data = await response.json();
-    console.log('Claude 응답:', JSON.stringify(data).slice(0, 300));
-
     const text = data?.content?.[0]?.text;
 
-    if (!text) {
-      throw new Error('Claude 응답 없음');
-    }
+    if (!text) throw new Error('Claude 응답 없음');
 
     return res.status(200).json({ result: text });
 
