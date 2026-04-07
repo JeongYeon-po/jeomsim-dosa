@@ -79,10 +79,13 @@
 
         document.getElementById('statusText').textContent = `${data.nickname}님 확인 완료!`;
 
-        // Firestore에 카카오 유저 저장
-        const uid = `kakao_${data.kakaoId}`;
-        const userRef = db.collection('users').doc(uid);
-        const userDoc = await userRef.get();
+       // Firestore 접근 없이 sessionStorage만 사용
+sessionStorage.setItem('kakaoUser', JSON.stringify({
+  uid,
+  nickname: data.nickname,
+  isNew: true, // 일단 항상 폼으로 (추후 개선)
+}));
+location.href = 'index.html';
 
         if (userDoc.exists) {
           // 재방문 → 웰컴 멘트 처리를 위해 세션 저장
