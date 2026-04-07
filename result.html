@@ -652,6 +652,35 @@
       }
     }
 
+function copyLink() {
+  navigator.clipboard.writeText('https://jeomsim-dosa.vercel.app')
+    .then(() => alert('링크가 복사됐습니다! 친구에게 공유해보세요 🔮'))
+    .catch(() => alert('복사 실패. 직접 복사해주세요: jeomsim-dosa.vercel.app'));
+}
+
+function shareKakao() {
+  const url = 'https://jeomsim-dosa.vercel.app';
+  const kakaoUrl = `https://sharer.kakao.com/talk/friends/picker/link?app_key=${kakaoAppKey}&validation_action=default&validation_params={}`;
+  
+  if (window.Kakao && window.Kakao.Share) {
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '점(占)심(心)도사',
+        description: '점은 봐줄게. 점심은 덤이야. 사주·MBTI·AI 운세',
+        imageUrl: 'https://jeomsim-dosa.vercel.app/og-image.png',
+        link: { mobileWebUrl: url, webUrl: url },
+      },
+      buttons: [{
+        title: '나도 운세 보기',
+        link: { mobileWebUrl: url, webUrl: url },
+      }],
+    });
+  } else {
+    // 카카오 SDK 없으면 링크 복사로 대체
+    copyLink();
+  }
+}
 
     async function askDosa() {
   const question = document.getElementById('askInput').value.trim();
