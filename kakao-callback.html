@@ -80,6 +80,7 @@
         document.getElementById('statusText').textContent = `${data.nickname}님 확인 완료!`;
 
        // Firestore 접근 없이 sessionStorage만 사용
+       const uid = `kakao_${data.kakaoId}`;
 sessionStorage.setItem('kakaoUser', JSON.stringify({
   uid,
   nickname: data.nickname,
