@@ -636,6 +636,41 @@
       }
     }
 
+
+    async function askDosa() {
+  const question = document.getElementById('askInput').value.trim();
+  if (!question) { alert('질문을 입력해주세요!'); return; }
+
+  const btn = document.querySelector('#askCard button');
+  const resultDiv = document.getElementById('askResult');
+  
+  btn.textContent = '도사가 생각하는 중... 🔮';
+  btn.disabled = true;
+  resultDiv.style.display = 'block';
+  resultDiv.textContent = '천기를 읽는 중입니다...';
+
+  const baziStr = baziData
+    ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
+    : '사주 데이터 없음';
+
+  try {
+    const res = await fetch('/api/fortune', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, mbti, bazi: baziStr, trust, gender, year,
+        question: question,
+      }),
+    });
+    const data = await res.json();
+    resultDiv.textContent = data.result || '답변을 가져오지 못했습니다.';
+  } catch(e) {
+    resultDiv.textContent = '일시적인 오류가 발생했습니다.';
+  } finally {
+    btn.textContent = '도사에게 물어보기 🔮';
+    btn.disabled = false;
+  }
+}
     // =====================
     // 피드백
     // =====================
