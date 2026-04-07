@@ -224,6 +224,22 @@
         <div id="foodList"></div>
       </div>
 
+
+      <!-- 도사에게 질문하기 -->
+<div class="card" id="askCard">
+  <div class="card-label">도사에게 질문하기</div>
+  <textarea id="askInput" placeholder="오늘 중요한 결정이 있는데 어떻게 할까요?" 
+    style="width:100%; background:#1a1a1a; border:1px solid #2a2a2a; color:#f5f0e8; 
+    padding:12px; border-radius:4px; font-size:14px; resize:none; height:80px; 
+    font-family:inherit; margin-bottom:12px;"></textarea>
+  <button onclick="askDosa()" 
+    style="width:100%; padding:14px; background:#c9a96e; color:#0d0d0d; 
+    border:none; font-size:14px; font-weight:700; cursor:pointer; border-radius:2px;">
+    도사에게 물어보기 🔮
+  </button>
+  <div id="askResult" style="display:none; margin-top:16px; font-size:14px; 
+    color:#d4b896; line-height:1.9; white-space:pre-wrap;"></div>
+</div>
       <!-- 피드백 -->
       <div class="feedback-card">
         <div class="feedback-title">오늘 도사의 말이 맞았나요?</div>
