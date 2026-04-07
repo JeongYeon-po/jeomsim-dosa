@@ -6,9 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: '허용되지 않는 메서드' });
 
-  
   try {
-    console.log('키 확인:', process.env.KAKAO_REST_API_KEY?.slice(0, 6));
     const { code } = req.body;
 
     if (!code) {
@@ -16,6 +14,7 @@ export default async function handler(req, res) {
     }
 
     const KAKAO_REST_API_KEY = process.env.KAKAO_REST_API_KEY;
+    const KAKAO_CLIENT_SECRET = process.env.KAKAO_CLIENT_SECRET;
     const REDIRECT_URI = 'https://jeomsim-dosa.vercel.app/kakao-callback.html';
 
     // 1. 카카오에서 액세스 토큰 받기
@@ -23,10 +22,11 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        grant_type:   'authorization_code',
-        client_id:    KAKAO_REST_API_KEY,
-        redirect_uri: REDIRECT_URI,
-        code:         code,
+        grant_type:    'authorization_code',
+        client_id:     KAKAO_REST_API_KEY,
+        redirect_uri:  REDIRECT_URI,
+        code:          code,
+        client_secret: KAKAO_CLIENT_SECRET,
       }),
     });
 
@@ -48,8 +48,6 @@ export default async function handler(req, res) {
 
     console.log('카카오 유저:', kakaoId, nickname);
 
-    // 3. Firebase Admin으로 커스텀 토큰 생성
-    // (Firebase Admin SDK 설정 필요 — 다음 단계)
     return res.status(200).json({
       kakaoId,
       nickname,
