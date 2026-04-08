@@ -685,6 +685,30 @@ function shareKakao() {
   }
 }
 
+// =====================
+// QR 코드 토글
+// =====================
+let qrGenerated = false;
+function showQR() {
+  const qrDiv = document.getElementById('qrCode');
+  if (qrDiv.style.display === 'none') {
+    qrDiv.style.display = 'block';
+    if (!qrGenerated) {
+      // QR 코드 생성 (한 번만 생성하고 재사용)
+      new QRCode(qrDiv, {
+        text: 'https://jeomsim-dosa.vercel.app',
+        width: 160,
+        height: 160,
+        colorDark: '#c9a96e',   // 골드 컬러
+        colorLight: '#0d0d0d',  // 배경 다크
+      });
+      qrGenerated = true;
+    }
+  } else {
+    qrDiv.style.display = 'none';
+  }
+}
+
     async function askDosa() {
   const question = document.getElementById('askInput').value.trim();
   if (!question) { alert('질문을 입력해주세요!'); return; }
