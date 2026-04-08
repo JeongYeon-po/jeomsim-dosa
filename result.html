@@ -944,54 +944,9 @@ async function loadMenu() {
       // 결핍 배너
       if (hour==='unknown') document.getElementById('missingBanner').style.display='block';
 
-    // 점심 추천 — Claude API 실시간 추천
-      document.getElementById('foodLabel').textContent = '오늘의 점심 추천 — AI 도사가 고르는 중...';
-      document.getElementById('foodList').innerHTML = '<div style="font-size:13px;color:#a0845c;text-align:center;padding:20px;">도사가 메뉴를 고르는 중...</div>';
-
-      const 천간오행2 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
-      const 지지오행2 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
-      const cnt2 = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-      if (baziData) {
-        [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
-          if (p && 천간오행2[p.gan]) cnt2[천간오행2[p.gan]]++;
-          if (p && 지지오행2[p.ji]) cnt2[지지오행2[p.ji]]++;
-        });
-      }
-      const ohengStr2 = Object.entries(cnt2).map(([k,v]) => `${k}${v}`).join(' ');
-
-      fetch('/api/menu', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, mbti, oheng: ohengStr2, gender, year }),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.menus) {
-          document.getElementById('foodLabel').textContent = '오늘의 점심 추천';
-          document.getElementById('foodList').innerHTML = data.menus.map((f, i) => `
-            <div class="food-item">
-              <div class="food-rank">0${i+1}</div>
-              <div>
-                <div class="food-name">${f.name}</div>
-                <div class="food-reason">${f.reason}</div>
-              </div>
-            </div>
-          `).join('');
-        }
-      })
-      .catch(() => {
-        // API 실패시 기존 오행 기반 추천으로 폴백
-        document.getElementById('foodLabel').textContent = `오늘의 점심 추천 — ${오늘오행} 기운 보충`;
-        document.getElementById('foodList').innerHTML = FOODS[오늘오행].map((f,i) => `
-          <div class="food-item">
-            <div class="food-rank">0${i+1}</div>
-            <div>
-              <div class="food-name">${f.name}</div>
-              <div class="food-reason">${f.reason}</div>
-            </div>
-          </div>
-        `).join('');
-      });
+   // 점심 추천 — Claude API 실시간 추천
+document.getElementById('foodSection').style.display = 'block';
+loadMenu();
 
     }, 1800);
   </script>
