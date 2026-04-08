@@ -79,32 +79,28 @@
 
         document.getElementById('statusText').textContent = `${data.nickname}님 확인 완료!`;
 
-       // Firestore 접근 없이 sessionStorage만 사용
-       const uid = `kakao_${data.kakaoId}`;
-sessionStorage.setItem('kakaoUser', JSON.stringify({
-  uid,
-  nickname: data.nickname,
-  isNew: true, // 일단 항상 폼으로 (추후 개선)
-}));
-location.href = 'index.html';
+   const uid = `kakao_${data.kakaoId}`;
 
-        if (userDoc.exists) {
-          // 재방문 → 웰컴 멘트 처리를 위해 세션 저장
-          sessionStorage.setItem('kakaoUser', JSON.stringify({
-            uid,
-            nickname: data.nickname,
-            isNew: false,
-          }));
-          location.href = 'index.html';
-        } else {
-          // 첫 방문 → 폼으로
-          sessionStorage.setItem('kakaoUser', JSON.stringify({
-            uid,
-            nickname: data.nickname,
-            isNew: true,
-          }));
-          location.href = 'index.html';
-        }
+// Firestore에서 기존 유저 확인
+const userDoc = await db.collection('users').doc(uid).get();
+
+if (userDoc.exists) {
+  // 재방문
+  sessionStorage.setItem('kakaoUser', JSON.stringify({
+    uid,
+    nickname: data.nickname,
+    isNew: false,
+  }));
+} else {
+  // 첫 방문
+  sessionStorage.setItem('kakaoUser', JSON.stringify({
+    uid,
+    nickname: data.nickname,
+    isNew: true,
+  }));
+}
+
+location.href = 'index.html';
 
       } catch (err) {
         console.error('카카오 콜백 오류:', err);
