@@ -362,6 +362,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -385,6 +386,15 @@
         로그인 없이 둘러보기 →
       </button>
     </div>
+    <div style="margin-top:24px; text-align:center;">
+  <button onclick="toggleQR()" 
+    style="background:none; border:1px solid #2a2a2a; color:#a0845c; 
+    padding:10px 24px; font-size:12px; cursor:pointer; border-radius:2px; 
+    letter-spacing:1px; margin-bottom:12px;">
+    QR 코드로 공유 📱
+  </button>
+  <div id="qrCode" style="display:none; margin-top:12px;"></div>
+</div>
     <div class="footer">점(占)심(心)도사 · AI FORTUNE · 2026</div>
   </div>
 
@@ -731,6 +741,26 @@ location.href = `result.html?${query}`;
       const REDIRECT_URI = 'https://jeomsim-dosa.vercel.app/kakao-callback.html';
       location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     }
+    //QR 관련 
+    let qrGenerated = false;
+function toggleQR() {
+  const qrDiv = document.getElementById('qrCode');
+  if (qrDiv.style.display === 'none') {
+    qrDiv.style.display = 'block';
+    if (!qrGenerated) {
+      new QRCode(qrDiv, {
+        text: 'https://jeomsim-dosa.vercel.app',
+        width: 160,
+        height: 160,
+        colorDark: '#c9a96e',
+        colorLight: '#0d0d0d',
+      });
+      qrGenerated = true;
+    }
+  } else {
+    qrDiv.style.display = 'none';
+  }
+}
 async function checkKakaoUser() {
   const kakaoUser = sessionStorage.getItem('kakaoUser');
   if (kakaoUser) {
