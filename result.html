@@ -272,7 +272,7 @@
   border:1px solid #2a2a2a; font-size:14px; cursor:pointer; border-radius:2px; margin-top:8px;">
   주소 QR 코드 📱
 </button>
-<div id="qrCode" style="display:none; margin-top:16px; text-align:center; display:flex; justify-content:center;"></div>
+<div id="qrCode" style="display:none; margin-top:16px; justify-content:center;"></div>
 </div>
       <button class="retry-btn" onclick="location.href='index.html'">← 처음으로 돌아가기</button>
 
@@ -698,7 +698,7 @@ let qrGenerated = false;
 function showQR() {
   const qrDiv = document.getElementById('qrCode');
   if (qrDiv.style.display === 'none') {
-    qrDiv.style.display = 'block';
+    qrDiv.style.display = 'flex';
     if (!qrGenerated) {
       // QR 코드 생성 (한 번만 생성하고 재사용)
       new QRCode(qrDiv, {
