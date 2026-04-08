@@ -732,7 +732,7 @@ location.href = `result.html?${query}`;
         })
         .catch(err => {
           console.log('로그인 실패:', err);
-          // 로그인 실패해도 그냥 폼으로 이동 (테스트용)
+          // 취소 시 로그인 없이 둘러보기 폼으로 이동
           showForm();
         });
     }
