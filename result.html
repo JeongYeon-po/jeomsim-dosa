@@ -779,6 +779,92 @@ function showQR() {
       if (el) el.textContent = steps[si];
     }, 550);
 
+
+// =====================
+// 메뉴 추천 함수 (캐시 포함)
+// =====================
+async function loadMenu() {
+  const kakaoUserData = sessionStorage.getItem('kakaoUser');
+  const menuUid = auth.currentUser ? auth.currentUser.uid 
+                : (kakaoUserData ? JSON.parse(kakaoUserData).uid : null);
+  const today2 = new Date().toISOString().slice(0, 10);
+
+  // 캐시 확인
+  if (menuUid) {
+    try {
+      const menuCache = await db.collection('menus').doc(`${menuUid}_${today2}`).get();
+      if (menuCache.exists) {
+        const cached = menuCache.data().menus;
+        document.getElementById('foodLabel').textContent = '오늘의 점심 추천';
+        document.getElementById('foodList').innerHTML = cached.map((f, i) => `
+          <div class="food-item">
+            <div class="food-rank">0${i+1}</div>
+            <div>
+              <div class="food-name">${f.name}</div>
+              <div class="food-reason">${f.reason}</div>
+            </div>
+          </div>
+        `).join('');
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // 오행 계산
+  const 천간오행2 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+  const 지지오행2 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+  const cnt2 = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+  if (baziData) {
+    [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
+      if (p && 천간오행2[p.gan]) cnt2[천간오행2[p.gan]]++;
+      if (p && 지지오행2[p.ji]) cnt2[지지오행2[p.ji]]++;
+    });
+  }
+  const ohengStr2 = Object.entries(cnt2).map(([k,v]) => `${k}${v}`).join(' ');
+
+  // API 호출
+  try {
+    const res = await fetch('/api/menu', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, mbti, oheng: ohengStr2, gender, year }),
+    });
+    const data = await res.json();
+
+    if (data.menus) {
+      document.getElementById('foodLabel').textContent = '오늘의 점심 추천';
+      document.getElementById('foodList').innerHTML = data.menus.map((f, i) => `
+        <div class="food-item">
+          <div class="food-rank">0${i+1}</div>
+          <div>
+            <div class="food-name">${f.name}</div>
+            <div class="food-reason">${f.reason}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Firestore 캐시 저장
+      if (menuUid) {
+        db.collection('menus').doc(`${menuUid}_${today2}`).set({
+          menus: data.menus,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    }
+  } catch(e) {
+    // 실패시 오행 기반 폴백
+    document.getElementById('foodLabel').textContent = `오늘의 점심 추천 — ${오늘오행} 기운 보충`;
+    document.getElementById('foodList').innerHTML = FOODS[오늘오행].map((f,i) => `
+      <div class="food-item">
+        <div class="food-rank">0${i+1}</div>
+        <div>
+          <div class="food-name">${f.name}</div>
+          <div class="food-reason">${f.reason}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
     // =====================
     // 렌더링
     // =====================
