@@ -960,6 +960,65 @@ document.getElementById('foodSection').style.display = 'block';
 loadMenu();
 
     }, 1800);
+// =====================
+// 톤 슬라이더 토글
+// =====================
+const TONE_LABELS = [
+  '🔬 완전 과학 모드 — 심리학·통계 데이터 기반으로 냉철하게',
+  '📊 데이터 우선 모드 — 근거 중심, 사주 패턴도 참고',
+  '⚖️ 밸런스 모드 — 데이터와 운세를 반반',
+  '🌙 운세 참고 모드 — 사주·MBTI 중심으로',
+  '🔮 신비 모드 — 도사가 운세의 언어로',
+  '🌟 완전 신비 모드 — 천기와 기운의 언어로',
+];
+
+function toggleToneSlider() {
+  const wrap = document.getElementById('toneSliderWrap');
+  const isHidden = wrap.style.display === 'none';
+  wrap.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    // 슬라이더 초기값을 현재 trust로 맞추기
+    document.getElementById('toneSlider').value = trust;
+    document.getElementById('toneLabel').textContent = TONE_LABELS[trust];
+  }
+}
+
+async function onToneChange(value) {
+  const newTrust = parseInt(value);
+  document.getElementById('toneLabel').textContent = TONE_LABELS[newTrust];
+  document.getElementById('modeBadge').textContent = MODES[newTrust];
+
+  // 운세 재생성
+  document.getElementById('verdictText').textContent = `"${VERDICTS[newTrust]}"`;
+
+  // Claude API 재호출 (fortune + pakpok)
+  try {
+    const [fortuneRes, pakpokRes] = await Promise.all([
+      fetch('/api/fortune', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, mbti, bazi: baziStr, oheng: ohengStr, trust: newTrust, gender, year }),
+      }),
+      fetch('/api/pakpok', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, mbti, bazi: baziStr, oheng: ohengStr, trust: newTrust, gua: guaStr, tarot: tarotStr }),
+      }),
+    ]);
+
+    const fortuneData = await fortuneRes.json();
+    const pakpokData  = await pakpokRes.json();
+
+    if (fortuneData.result) {
+      document.getElementById('detailText').textContent = fortuneData.result;
+    }
+    if (pakpokData.result) {
+      document.getElementById('pakpokText').textContent = pakpokData.result;
+    }
+  } catch (err) {
+    console.error('톤 변경 오류:', err);
+  }
+}
   </script>
 </body>
 </html>
