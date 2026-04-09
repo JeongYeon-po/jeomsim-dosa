@@ -124,7 +124,18 @@
         <div class="badge">오늘의 점(占)심(心)</div>
         <div class="user-name" id="userName">홍길동<span>님</span></div>
         <div class="user-meta" id="userMeta">INTJ · 1990년생 · 남성</div>
-        <div class="mode-badge" id="modeBadge">⚖️ 밸런스 모드</div>
+                <div class="mode-badge" id="modeBadge" onclick="toggleToneSlider()" style="cursor:pointer;">⚖️ 밸런스 모드</div>
+
+        <div id="toneSliderWrap" style="display:none; margin-top:12px; padding:16px; background:#111; border:1px solid #2a2a2a; border-radius:8px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#555; margin-bottom:10px;">
+            <span>🔬 과학</span>
+            <span>🌟 신비</span>
+          </div>
+          <input type="range" id="toneSlider" min="0" max="5" step="1" value="2"
+            style="width:100%;"
+            oninput="onToneChange(this.value)" />
+          <div id="toneLabel" style="text-align:center; font-size:12px; color:#a0845c; margin-top:10px;"></div>
+        </div>
       </div>
 
       <!-- 사주 4기둥 -->
