@@ -459,10 +459,24 @@
     }
 
     // =====================
+    // 오늘 날짜 (로컬 기준, YYYY-MM-DD)
+    // Firestore 캐시 키와 rand() 시드가 서로 다른 기준(UTC vs 로컬)을 쓰면
+    // 자정~오전 9시(UTC/KST 날짜가 어긋나는 구간) 사이에 방금 뽑힌 타로/괘와
+    // 캐시된 예전 운세 분석이 서로 안 맞는 문제가 생겨서 하나로 통일함
+    // =====================
+    function todayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    // =====================
     // 시드 난수
     // =====================
     function rand(seed, max) {
-      const today = new Date().toDateString();
+      const today = todayKey();
       let h = 0;
       for (const c of (today + name + seed)) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
       return Math.abs(h) % max;
@@ -603,7 +617,7 @@
       // 로그인 유저 확인
       const user = auth.currentUser;
       const uid = user ? user.uid : getKakaoUid();
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayKey();
 
       // 캐시 확인
       if (uid) {
@@ -678,7 +692,7 @@
          // 로그인 유저 확인 + 캐시 체크
         const user = auth.currentUser;
         const uid = user ? user.uid : getKakaoUid();
-        const today = new Date().toISOString().slice(0, 10);
+        const today = todayKey();
         // 비로그인이면 차단
         
         if (!uid) {
@@ -837,7 +851,7 @@ function showQR() {
   const uid = user ? user.uid : getKakaoUid();
   if (!uid) return; // 비로그인은 저장 안 함
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKey();
   db.collection('feedback').doc(`${uid}_${today}`).set({
     answer: ans,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -861,7 +875,7 @@ function showQR() {
 // =====================
 async function loadMenu() {
   const menuUid = auth.currentUser ? auth.currentUser.uid : getKakaoUid();
-  const today2 = new Date().toISOString().slice(0, 10);
+  const today2 = todayKey();
 
   // 캐시 확인
   if (menuUid) {
