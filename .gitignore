@@ -1,0 +1,10 @@
+# Firebase / Google service account keys — 절대 커밋 금지 (Admin 권한 키)
+*firebase-adminsdk*.json
+serviceAccountKey.json
+*.pem
+*.key
+
+node_modules/
+.vercel/
+.env
+.env.local
