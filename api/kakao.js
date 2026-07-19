@@ -1,4 +1,22 @@
+import admin from 'firebase-admin';
+
 export const config = { maxDuration: 20 };
+
+// Firestore 보안 규칙은 실제 Firebase 인증(request.auth)을 요구하는데,
+// 카카오 로그인은 Firebase Auth를 거치지 않고 uid 문자열만 흉내내던 상태라
+// Firestore 쓰기/읽기가 'Missing or insufficient permissions'로 막혔었음.
+// Firebase Admin SDK로 커스텀 토큰을 발급해서 클라이언트가 진짜로 로그인하게 함.
+function getFirebaseAdmin() {
+  if (!admin.apps.length) {
+    const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    if (!key) throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY 환경변수가 설정되지 않음');
+    const serviceAccount = JSON.parse(Buffer.from(key, 'base64').toString('utf8'));
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  }
+  return admin;
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -50,10 +68,24 @@ export default async function handler(req, res) {
 
     console.log('카카오 유저:', kakaoId, nickname);
 
+    // Firebase 커스텀 토큰 발급 (실패해도 카카오 로그인 자체는 막지 않고, 클라이언트가
+    // 기존 방식(세션스토리지)으로 폴백하도록 customToken을 null로 반환)
+    let customToken = null;
+    try {
+      const fbAdmin = getFirebaseAdmin();
+      customToken = await fbAdmin.auth().createCustomToken(`kakao_${kakaoId}`, {
+        provider: 'kakao',
+        nickname,
+      });
+    } catch (adminErr) {
+      console.error('Firebase 커스텀 토큰 발급 실패:', adminErr);
+    }
+
     return res.status(200).json({
       kakaoId,
       nickname,
       accessToken: tokenData.access_token,
+      customToken,
     });
 
   } catch (err) {

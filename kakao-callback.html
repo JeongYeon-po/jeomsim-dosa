@@ -79,6 +79,16 @@
 
         document.getElementById('statusText').textContent = `${data.nickname}님 확인 완료!`;
 
+        // Firebase 커스텀 토큰으로 실제 로그인 (Firestore 보안 규칙 통과를 위해 필요)
+        // 실패해도 기존처럼 세션스토리지 기반으로는 계속 진행되도록 에러를 삼킴
+        if (data.customToken) {
+          try {
+            await auth.signInWithCustomToken(data.customToken);
+          } catch (signInErr) {
+            console.error('Firebase 커스텀 토큰 로그인 실패:', signInErr);
+          }
+        }
+
    const uid = `kakao_${data.kakaoId}`;
 
 // Firestore에서 기존 유저 확인
