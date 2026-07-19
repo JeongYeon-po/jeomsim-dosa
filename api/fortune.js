@@ -116,26 +116,26 @@ ${question}
 
     const data = await response.json();
 
-    // Claude API가 에러 객체를 반환한 경우 (레이트리밋, 과부하 등) 원인을 그대로 노출
+    // Claude API가 에러 객체를 반환한 경우 (레이트리밋, 과부하 등)
     if (!response.ok || data?.type === 'error') {
       console.error('Claude API 에러 응답:', response.status, JSON.stringify(data));
-      return res.status(502).json({
-        error: '도사가 응답하지 못했습니다.',
-        detail: `status ${response.status}: ${data?.error?.type || ''} ${data?.error?.message || JSON.stringify(data)}`,
-      });
+      return res.status(502).json({ error: '도사가 응답하지 못했습니다. 잠시 후 다시 시도해주세요.' });
     }
 
-    const text = data?.content?.[0]?.text;
+    // claude-sonnet-5는 답변 앞에 빈 thinking(추론) 블록을 먼저 보낼 때가 있어
+    // content[0]이 아니라 type이 'text'인 블록을 찾아서 사용해야 함
+    const textBlock = Array.isArray(data?.content) ? data.content.find(b => b?.type === 'text') : null;
+    const text = textBlock?.text;
 
     if (!text) {
-      console.error('Claude 응답에 text 없음:', JSON.stringify(data));
-      throw new Error('Claude 응답 없음: ' + JSON.stringify(data).slice(0, 300));
+      console.error('Claude 응답에 text 블록 없음:', JSON.stringify(data));
+      throw new Error('Claude 응답 없음');
     }
 
     return res.status(200).json({ result: text });
 
   } catch (err) {
     console.error('API 오류:', err);
-    return res.status(500).json({ error: '분석 중 오류가 발생했습니다.', detail: String(err && err.message || err) });
+    return res.status(500).json({ error: '분석 중 오류가 발생했습니다.' });
   }
 }

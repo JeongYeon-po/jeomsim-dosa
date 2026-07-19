@@ -60,7 +60,8 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const text = data?.content?.[0]?.text;
+    // content[0]이 항상 텍스트 블록이라는 보장이 없어 type이 'text'인 블록을 찾음
+    const text = Array.isArray(data?.content) ? data.content.find(b => b?.type === 'text')?.text : undefined;
 
     if (!text) throw new Error('응답 없음');
 
