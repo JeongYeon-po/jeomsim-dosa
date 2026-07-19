@@ -115,14 +115,27 @@ ${question}
     });
 
     const data = await response.json();
+
+    // Claude API가 에러 객체를 반환한 경우 (레이트리밋, 과부하 등) 원인을 그대로 노출
+    if (!response.ok || data?.type === 'error') {
+      console.error('Claude API 에러 응답:', response.status, JSON.stringify(data));
+      return res.status(502).json({
+        error: '도사가 응답하지 못했습니다.',
+        detail: `status ${response.status}: ${data?.error?.type || ''} ${data?.error?.message || JSON.stringify(data)}`,
+      });
+    }
+
     const text = data?.content?.[0]?.text;
 
-    if (!text) throw new Error('Claude 응답 없음');
+    if (!text) {
+      console.error('Claude 응답에 text 없음:', JSON.stringify(data));
+      throw new Error('Claude 응답 없음: ' + JSON.stringify(data).slice(0, 300));
+    }
 
     return res.status(200).json({ result: text });
 
   } catch (err) {
     console.error('API 오류:', err);
-    return res.status(500).json({ error: '분석 중 오류가 발생했습니다.' });
+    return res.status(500).json({ error: '분석 중 오류가 발생했습니다.', detail: String(err && err.message || err) });
   }
 }
