@@ -1,3 +1,7 @@
+// Sonnet으로 1500~2000자 분량을 생성하면 기본 서버리스 함수 실행시간 제한(초 단위)을
+// 넘겨서 500 에러가 나는 경우가 있어 여유 있게 늘려둠
+export const config = { maxDuration: 60 };
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
