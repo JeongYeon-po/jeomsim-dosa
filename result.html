@@ -41,6 +41,11 @@
     .oheng-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid #2a2a2a; color: #888; }
     .oheng-badge.strong { border-color: #c9a96e; color: #c9a96e; background: #1e1810; }
 
+    /* 오행 레이더 차트 */
+    .radar-card { text-align: center; }
+    .radar-label { font-size: 12px; fill: #888; font-family: inherit; }
+    .radar-label tspan { fill: #c9a96e; font-weight: 600; }
+
     .verdict-card { background: #111; border: 1px solid #c9a96e33; border-radius: 8px; padding: 28px 24px; margin-bottom: 14px; text-align: center; }
     .verdict-text { font-size: 16px; color: #d4b896; line-height: 1.9; margin-bottom: 14px; }
     .verdict-sign { font-size: 11px; color: #333; letter-spacing: 2px; }
@@ -143,6 +148,12 @@
         <div class="card-label">내 사주팔자</div>
         <div class="bazi-row" id="baziRow"></div>
         <div class="oheng-row" id="ohengRow"></div>
+      </div>
+
+      <!-- 오행 분포 레이더 차트 -->
+      <div class="card radar-card" id="ohengChartCard" style="display:none;">
+        <div class="card-label">오행 밸런스</div>
+        <div id="ohengRadar" style="display:flex; justify-content:center;"></div>
       </div>
 
        <!-- 오늘의 운세 확인하기 버튼 -->
@@ -481,6 +492,59 @@
         </div>
         <div class="tarot-meaning">${dir==='역방향'?'(역방향) ':''}${card.meaning}</div>
       `;
+    }
+
+    // =====================
+    // 오행 분포 레이더 차트 (SVG)
+    // =====================
+    function renderOhengRadar(cnt) {
+      const order  = ['목', '화', '토', '금', '수'];
+      const size   = 240, center = size / 2, maxR = 88;
+      const scaleMax = Math.max(4, ...order.map(k => cnt[k] || 0));
+
+      const pt = (i, r) => {
+        const angle = (-90 + i * (360 / order.length)) * Math.PI / 180;
+        return [center + r * Math.cos(angle), center + r * Math.sin(angle)];
+      };
+
+      // 배경 그리드 (동심 오각형)
+      const gridPolys = [0.33, 0.66, 1].map(f =>
+        `<polygon points="${order.map((_, i) => pt(i, maxR * f).join(',')).join(' ')}"
+          fill="none" stroke="#2a2a2a" stroke-width="1"/>`
+      ).join('');
+
+      // 중심에서 각 축으로 뻗는 라인
+      const axisLines = order.map((_, i) => {
+        const [x, y] = pt(i, maxR);
+        return `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="#2a2a2a" stroke-width="1"/>`;
+      }).join('');
+
+      // 데이터 폴리곤
+      const dataPts = order.map((k, i) => pt(i, (cnt[k] || 0) / scaleMax * maxR));
+      const dataPoly = `<polygon points="${dataPts.map(p => p.join(',')).join(' ')}"
+        fill="#c9a96e" fill-opacity="0.22" stroke="#c9a96e" stroke-width="2" stroke-linejoin="round"/>`;
+
+      // 데이터 포인트
+      const dots = dataPts.map(([x, y], i) =>
+        `<circle cx="${x}" cy="${y}" r="4" fill="#c9a96e"><title>${order[i]} ${cnt[order[i]] || 0}</title></circle>`
+      ).join('');
+
+      // 축 라벨 (오행 이름 + 값, 뱃지와 동일한 표기)
+      const labels = order.map((k, i) => {
+        const [x, y] = pt(i, maxR + 24);
+        return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" class="radar-label">${k} <tspan>${cnt[k] || 0}</tspan></text>`;
+      }).join('');
+
+      document.getElementById('ohengRadar').innerHTML = `
+        <svg viewBox="0 0 ${size} ${size}" width="220" height="220" role="img" aria-label="오행 분포 레이더 차트">
+          ${gridPolys}
+          ${axisLines}
+          ${dataPoly}
+          ${dots}
+          ${labels}
+        </svg>
+      `;
+      document.getElementById('ohengChartCard').style.display = 'block';
     }
 
     // =====================
@@ -920,6 +984,8 @@ async function loadMenu() {
             ${k} ${v}
           </div>
         `).join('');
+
+        renderOhengRadar(cnt);
       }
 
       // 점수

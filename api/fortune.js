@@ -104,7 +104,7 @@ ${question}
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-sonnet-5',
         max_tokens: question ? 1000 : 2500,
         messages: [{ role: 'user', content: prompt }],
       }),
