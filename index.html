@@ -675,10 +675,16 @@ const query = new URLSearchParams({
   month: formData.month,
   day: formData.day,
 }).toString();
-     // Firestore에 유저 데이터 저장
-      const user = auth.currentUser;
-      if (user) {
-        db.collection('users').doc(user.uid).set({
+     // Firestore에 유저 데이터 저장 (구글 로그인 or 카카오 로그인 유저 모두 지원)
+      const googleUser = auth.currentUser;
+      const kakaoUserRaw = sessionStorage.getItem('kakaoUser');
+      const kakaoUser = kakaoUserRaw ? JSON.parse(kakaoUserRaw) : null;
+      const uid = googleUser ? googleUser.uid : (kakaoUser ? kakaoUser.uid : null);
+
+      const goToResultPage = () => { location.href = `result.html?${query}`; };
+
+      if (uid) {
+        db.collection('users').doc(uid).set({
           name:      formData.name,
           mbti:      formData.mbti,
           year:      formData.year,
@@ -689,10 +695,16 @@ const query = new URLSearchParams({
           trust:     formData.trustLevel,
           calType:   formData.calType,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true }).then(() => {
+          console.log('유저 데이터 저장 완료!');
+          goToResultPage();
+        }).catch(err => {
+          console.error('유저 데이터 저장 실패:', err);
+          goToResultPage();
         });
-        console.log('유저 데이터 저장 완료!');
+      } else {
+        goToResultPage();
       }
-location.href = `result.html?${query}`;
     }
 
     initDateSelects();

@@ -85,14 +85,27 @@
 const userDoc = await db.collection('users').doc(uid).get();
 
 if (userDoc.exists) {
-  // 재방문
+  // 재방문 - 마지막 로그인 시간만 갱신 (기존 데이터 유지)
+  await db.collection('users').doc(uid).set({
+    nickname:     data.nickname,
+    lastLoginAt:  firebase.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
   sessionStorage.setItem('kakaoUser', JSON.stringify({
     uid,
     nickname: data.nickname,
     isNew: false,
   }));
 } else {
-  // 첫 방문
+  // 첫 방문 - Firestore에 유저 문서 생성 (캐시)
+  await db.collection('users').doc(uid).set({
+    kakaoId:     data.kakaoId,
+    nickname:    data.nickname,
+    provider:    'kakao',
+    createdAt:   firebase.firestore.FieldValue.serverTimestamp(),
+    lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+
   sessionStorage.setItem('kakaoUser', JSON.stringify({
     uid,
     nickname: data.nickname,
