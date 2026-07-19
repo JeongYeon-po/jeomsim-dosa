@@ -764,24 +764,30 @@ function copyLink() {
 
 function shareKakao() {
   const url = 'https://jeomsim-dosa.vercel.app';
-  
-  if (window.Kakao && window.Kakao.Share) {
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '점(占)심(心)도사',
-        description: '점은 봐줄게. 점심은 덤이야. 사주·MBTI·AI 운세',
-        imageUrl: 'https://jeomsim-dosa.vercel.app/og-image.png',
-        link: { mobileWebUrl: url, webUrl: url },
-      },
-      buttons: [{
-        title: '나도 운세 보기',
-        link: { mobileWebUrl: url, webUrl: url },
-      }],
-    });
-  } else {
-    copyLink();
+
+  try {
+    if (window.Kakao && window.Kakao.Share) {
+      Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '점(占)심(心)도사',
+          description: '점은 봐줄게. 점심은 덤이야. 사주·MBTI·AI 운세',
+          imageUrl: 'https://jeomsim-dosa.vercel.app/og-image.png',
+          link: { mobileWebUrl: url, webUrl: url },
+        },
+        buttons: [{
+          title: '나도 운세 보기',
+          link: { mobileWebUrl: url, webUrl: url },
+        }],
+      });
+      return;
+    }
+  } catch (e) {
+    // 팝업 차단 등으로 카카오 공유 SDK가 실패하면(내부에서 window.open 결과가
+    // null이라 .focus() 호출 중 TypeError가 나는 경우 등) 링크 복사로 대체
+    console.warn('카카오 공유 실패, 링크 복사로 대체:', e);
   }
+  copyLink();
 }
 
 // =====================
