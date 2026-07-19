@@ -395,7 +395,7 @@
   </button>
   <div id="qrCode" style="display:none; margin-top:12px;"></div>
 </div>
-    <div class="footer">점(占)심(心)도사 · AI FORTUNE · 2026</div>
+    <div class="footer">점(占)심(心)도사 · AI FORTUNE · 2026 · <a href="javascript:void(0)" onclick="logoutUser()" style="color:#555;text-decoration:underline;">로그아웃</a></div>
   </div>
 
   <div id="formPage">
@@ -762,7 +762,19 @@ const query = new URLSearchParams({
      function kakaoLogin() {
       const KAKAO_CLIENT_ID = '0383eddeb397e455a4399ec6c2390171';
       const REDIRECT_URI = 'https://jeomsim-dosa.vercel.app/kakao-callback.html';
-      location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+      // scope를 명시하지 않으면 닉네임 동의를 요청하지 않아 항상 기본값("도사")으로
+      // 표시되던 문제가 있어 닉네임 동의를 명시적으로 요청함
+      // (카카오 디벨로퍼스 > 카카오 로그인 > 동의항목에서 "닉네임"이 활성화돼 있어야 함)
+      location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=profile_nickname`;
+    }
+
+    // =====================
+    // 로그아웃 (구글/카카오 공통)
+    // =====================
+    async function logoutUser() {
+      try { await auth.signOut(); } catch (e) { console.warn('로그아웃 실패:', e); }
+      sessionStorage.removeItem('kakaoUser');
+      location.reload();
     }
     //QR 관련 
     let qrGenerated = false;
