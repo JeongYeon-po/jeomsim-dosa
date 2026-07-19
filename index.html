@@ -677,8 +677,7 @@ const query = new URLSearchParams({
 }).toString();
      // Firestore에 유저 데이터 저장 (구글 로그인 or 카카오 로그인 유저 모두 지원)
       const googleUser = auth.currentUser;
-      const kakaoUserRaw = sessionStorage.getItem('kakaoUser');
-      const kakaoUser = kakaoUserRaw ? JSON.parse(kakaoUserRaw) : null;
+      const kakaoUser = getKakaoUserObj();
       const uid = googleUser ? googleUser.uid : (kakaoUser ? kakaoUser.uid : null);
 
       const goToResultPage = () => { location.href = `result.html?${query}`; };
@@ -729,6 +728,18 @@ const query = new URLSearchParams({
     const auth = firebase.auth();
     const db   = firebase.firestore();
 
+    // 세션스토리지에 저장된 카카오 로그인 정보를 안전하게 읽어오는 헬퍼
+    // (손상된 JSON이 있어도 앱 전체가 죽지 않도록 예외 처리)
+    function getKakaoUserObj() {
+      try {
+        const raw = sessionStorage.getItem('kakaoUser');
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        console.warn('kakaoUser 파싱 실패:', e);
+        return null;
+      }
+    }
+
     // =====================
     // 구글 로그인
     // =====================
@@ -774,9 +785,8 @@ function toggleQR() {
   }
 }
 async function checkKakaoUser() {
-  const kakaoUser = sessionStorage.getItem('kakaoUser');
-  if (kakaoUser) {
-    const data = JSON.parse(kakaoUser);
+  const data = getKakaoUserObj();
+  if (data) {
     if (data.isNew) {
       showForm();
     } else {

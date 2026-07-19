@@ -424,6 +424,41 @@
     }
 
     // =====================
+    // 사주/오행 문자열 공용 헬퍼 (중복 계산 제거)
+    // =====================
+    const 천간오행_전역 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
+    const 지지오행_전역 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
+
+    function getBaziOhengStrings() {
+      const baziStr = baziData
+        ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
+        : '사주 데이터 없음';
+      const cnt = { 목:0, 화:0, 토:0, 금:0, 수:0 };
+      if (baziData) {
+        [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
+          if (p && 천간오행_전역[p.gan]) cnt[천간오행_전역[p.gan]]++;
+          if (p && 지지오행_전역[p.ji])  cnt[지지오행_전역[p.ji]]++;
+        });
+      }
+      const ohengStr = Object.entries(cnt).map(([k,v]) => `${k}${v}`).join(' ');
+      return { baziStr, ohengStr, cnt };
+    }
+
+    // 세션스토리지에 저장된 카카오 로그인 정보를 안전하게 읽어오는 헬퍼
+    // (손상된 JSON이 있어도 앱 전체가 죽지 않도록 예외 처리)
+    function getKakaoUid() {
+      try {
+        const raw = sessionStorage.getItem('kakaoUser');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && parsed.uid ? parsed.uid : null;
+      } catch (e) {
+        console.warn('kakaoUser 파싱 실패:', e);
+        return null;
+      }
+    }
+
+    // =====================
     // 시드 난수
     // =====================
     function rand(seed, max) {
@@ -567,8 +602,7 @@
 
       // 로그인 유저 확인
       const user = auth.currentUser;
-      const kakaoUser = sessionStorage.getItem('kakaoUser');
-      const uid = user ? user.uid : (kakaoUser ? JSON.parse(kakaoUser).uid : null);
+      const uid = user ? user.uid : getKakaoUid();
       const today = new Date().toISOString().slice(0, 10);
 
       // 캐시 확인
@@ -598,20 +632,7 @@
       const t2 = document.getElementById('tarot2')?.querySelector('.tarot-name')?.textContent || '';
       const t3 = document.getElementById('tarot3')?.querySelector('.tarot-name')?.textContent || '';
 
-      const baziStr = baziData
-        ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
-        : '사주 데이터 없음';
-
-      const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
-      const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
-      const cnt = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-      if (baziData) {
-        [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
-          if (p && 천간오행[p.gan]) cnt[천간오행[p.gan]]++;
-          if (p && 지지오행[p.ji])  cnt[지지오행[p.ji]]++;
-        });
-      }
-      const ohengStr = Object.entries(cnt).map(([k,v]) => `${k}${v}`).join(' ');
+      const { baziStr, ohengStr } = getBaziOhengStrings();
 
       // pakpok API 호출
       try {
@@ -633,7 +654,7 @@
         db.collection('pakpok').doc(`${uid}_${today}`).set({
           result: text,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        });
+        }).catch(err => console.error('팩폭 캐시 저장 실패:', err));
 
       } catch(e) {
         document.getElementById('verdictText').textContent = '일시적인 오류가 발생했습니다.';
@@ -656,8 +677,7 @@
         
          // 로그인 유저 확인 + 캐시 체크
         const user = auth.currentUser;
-        const kakaoUser = sessionStorage.getItem('kakaoUser');
-        const uid = user ? user.uid : (kakaoUser ? JSON.parse(kakaoUser).uid : null);
+        const uid = user ? user.uid : getKakaoUid();
         const today = new Date().toISOString().slice(0, 10);
         // 비로그인이면 차단
         
@@ -681,24 +701,8 @@
           }
         }
 
-        // 사주 데이터 문자열 만들기
-        const baziStr = baziData
-          ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
-          : '사주 데이터 없음';
-
-        // 오행 분포 문자열
-        const ohengStr = baziData
-          ? (() => {
-              const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
-              const 지지오행 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
-              const cnt = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-              [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
-                if (p && 천간오행[p.gan]) cnt[천간오행[p.gan]]++;
-                if (p && 지지오행[p.ji])  cnt[지지오행[p.ji]]++;
-              });
-              return Object.entries(cnt).map(([k,v]) => `${k}${v}`).join(' ');
-            })()
-          : '';
+        // 사주/오행 데이터 문자열 (공용 헬퍼 사용)
+        const { baziStr, ohengStr } = getBaziOhengStrings();
 
         // Gemini API 호출
         fetch('/api/fortune', {
@@ -726,7 +730,7 @@
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               mbti,
               year,
-            });
+            }).catch(err => console.error('사주 상세 캐시 저장 실패:', err));
             console.log('Firestore 저장 완료!');
           }
         })
@@ -802,9 +806,7 @@ function showQR() {
   resultDiv.style.display = 'block';
   resultDiv.textContent = '천기를 읽는 중입니다...';
 
-  const baziStr = baziData
-    ? `년주 ${baziData.year.gan}${baziData.year.ji} / 월주 ${baziData.month.gan}${baziData.month.ji} / 일주 ${baziData.day.gan}${baziData.day.ji} / 시주 ${baziData.hour.gan}${baziData.hour.ji}`
-    : '사주 데이터 없음';
+  const { baziStr } = getBaziOhengStrings();
 
   try {
     const res = await fetch('/api/fortune', {
@@ -832,15 +834,14 @@ function showQR() {
   document.getElementById('btnNo').className  = 'fb-btn' + (ans==='no'  ? ' no'  : '');
 
   const user = auth.currentUser;
-  const kakaoUser = sessionStorage.getItem('kakaoUser');
-  const uid = user ? user.uid : (kakaoUser ? JSON.parse(kakaoUser).uid : null);
+  const uid = user ? user.uid : getKakaoUid();
   if (!uid) return; // 비로그인은 저장 안 함
 
   const today = new Date().toISOString().slice(0, 10);
   db.collection('feedback').doc(`${uid}_${today}`).set({
     answer: ans,
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  });
+  }).catch(err => console.error('피드백 저장 실패:', err));
 }
 
     // =====================
@@ -859,9 +860,7 @@ function showQR() {
 // 메뉴 추천 함수 (캐시 포함)
 // =====================
 async function loadMenu() {
-  const kakaoUserData = sessionStorage.getItem('kakaoUser');
-  const menuUid = auth.currentUser ? auth.currentUser.uid 
-                : (kakaoUserData ? JSON.parse(kakaoUserData).uid : null);
+  const menuUid = auth.currentUser ? auth.currentUser.uid : getKakaoUid();
   const today2 = new Date().toISOString().slice(0, 10);
 
   // 캐시 확인
@@ -882,20 +881,13 @@ async function loadMenu() {
         `).join('');
         return;
       }
-    } catch(e) {}
+    } catch(e) {
+      console.warn('메뉴 캐시 조회 실패:', e);
+    }
   }
 
-  // 오행 계산
-  const 천간오행2 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
-  const 지지오행2 = { 子:'수',丑:'토',寅:'목',卯:'목',辰:'토',巳:'화',午:'화',未:'토',申:'금',酉:'금',戌:'토',亥:'수' };
-  const cnt2 = { 목:0, 화:0, 토:0, 금:0, 수:0 };
-  if (baziData) {
-    [baziData.year, baziData.month, baziData.day, baziData.hour].forEach(p => {
-      if (p && 천간오행2[p.gan]) cnt2[천간오행2[p.gan]]++;
-      if (p && 지지오행2[p.ji]) cnt2[지지오행2[p.ji]]++;
-    });
-  }
-  const ohengStr2 = Object.entries(cnt2).map(([k,v]) => `${k}${v}`).join(' ');
+  // 오행 계산 (공용 헬퍼 사용)
+  const { ohengStr: ohengStr2 } = getBaziOhengStrings();
 
   // API 호출
   try {
@@ -904,29 +896,32 @@ async function loadMenu() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, mbti, oheng: ohengStr2, gender, year }),
     });
+    if (!res.ok) throw new Error(`메뉴 API 응답 오류: ${res.status}`);
     const data = await res.json();
+    if (!data.menus || !Array.isArray(data.menus) || data.menus.length === 0) {
+      throw new Error('메뉴 API 응답에 menus 없음');
+    }
 
-    if (data.menus) {
-      document.getElementById('foodLabel').textContent = '오늘의 점심 추천';
-      document.getElementById('foodList').innerHTML = data.menus.map((f, i) => `
-        <div class="food-item">
-          <div class="food-rank">0${i+1}</div>
-          <div>
-            <div class="food-name">${f.name}</div>
-            <div class="food-reason">${f.reason}</div>
-          </div>
+    document.getElementById('foodLabel').textContent = '오늘의 점심 추천';
+    document.getElementById('foodList').innerHTML = data.menus.map((f, i) => `
+      <div class="food-item">
+        <div class="food-rank">0${i+1}</div>
+        <div>
+          <div class="food-name">${f.name}</div>
+          <div class="food-reason">${f.reason}</div>
         </div>
-      `).join('');
+      </div>
+    `).join('');
 
-      // Firestore 캐시 저장
-      if (menuUid) {
-        db.collection('menus').doc(`${menuUid}_${today2}`).set({
-          menus: data.menus,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-      }
+    // Firestore 캐시 저장
+    if (menuUid) {
+      db.collection('menus').doc(`${menuUid}_${today2}`).set({
+        menus: data.menus,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err => console.error('메뉴 캐시 저장 실패:', err));
     }
   } catch(e) {
+    console.warn('메뉴 추천 API 실패, 오행 기반 폴백 사용:', e);
     // 실패시 오행 기반 폴백
     document.getElementById('foodLabel').textContent = `오늘의 점심 추천 — ${오늘오행} 기운 보충`;
     document.getElementById('foodList').innerHTML = FOODS[오늘오행].map((f,i) => `
@@ -1054,36 +1049,55 @@ async function onToneChange(value) {
   document.getElementById('toneLabel').textContent = TONE_LABELS[newTrust];
   document.getElementById('modeBadge').textContent = MODES[newTrust];
 
-  // 운세 재생성
-  document.getElementById('verdictText').textContent = `"${VERDICTS[newTrust]}"`;
+  // 팩폭을 아직 요청한 적 없으면 기본 문구만 갱신
+  if (!fortuneLoaded) {
+    document.getElementById('verdictText').textContent = `"${VERDICTS[newTrust]}"`;
+  }
 
-  // Claude API 재호출 (fortune + pakpok)
-  try {
-    const [fortuneRes, pakpokRes] = await Promise.all([
+  const { baziStr: newBaziStr, ohengStr: newOhengStr } = getBaziOhengStrings();
+  const guaName    = document.getElementById('guaName')?.textContent    || '';
+  const guaMeaning = document.getElementById('guaMeaning')?.textContent || '';
+  const t1 = document.getElementById('tarot1')?.querySelector('.tarot-name')?.textContent || '';
+  const t2 = document.getElementById('tarot2')?.querySelector('.tarot-name')?.textContent || '';
+  const t3 = document.getElementById('tarot3')?.querySelector('.tarot-name')?.textContent || '';
+  const newGuaStr   = `${guaName} — ${guaMeaning}`;
+  const newTarotStr = `${t1} / ${t2} / ${t3}`;
+
+  // 이미 로드된 섹션만 재호출 (불필요한 API 호출 방지)
+  const tasks = [];
+
+  if (detailLoaded) {
+    tasks.push(
       fetch('/api/fortune', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, mbti, bazi: baziStr, oheng: ohengStr, trust: newTrust, gender, year }),
-      }),
+        body: JSON.stringify({ name, mbti, bazi: newBaziStr, oheng: newOhengStr, trust: newTrust, gender, year }),
+      })
+        .then(res => (res.ok ? res.json() : Promise.reject(new Error(`fortune API ${res.status}`))))
+        .then(data => {
+          if (data.result) document.getElementById('detailText').textContent = data.result;
+        })
+        .catch(err => console.error('톤 변경(사주 상세) 재호출 실패:', err))
+    );
+  }
+
+  if (fortuneLoaded) {
+    tasks.push(
       fetch('/api/pakpok', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, mbti, bazi: baziStr, oheng: ohengStr, trust: newTrust, gua: guaStr, tarot: tarotStr }),
-      }),
-    ]);
-
-    const fortuneData = await fortuneRes.json();
-    const pakpokData  = await pakpokRes.json();
-
-    if (fortuneData.result) {
-      document.getElementById('detailText').textContent = fortuneData.result;
-    }
-    if (pakpokData.result) {
-      document.getElementById('pakpokText').textContent = pakpokData.result;
-    }
-  } catch (err) {
-    console.error('톤 변경 오류:', err);
+        body: JSON.stringify({ name, mbti, bazi: newBaziStr, oheng: newOhengStr, trust: newTrust, gua: newGuaStr, tarot: newTarotStr }),
+      })
+        .then(res => (res.ok ? res.json() : Promise.reject(new Error(`pakpok API ${res.status}`))))
+        .then(data => {
+          if (data.result) document.getElementById('verdictText').textContent = data.result;
+        })
+        .catch(err => console.error('톤 변경(팩폭) 재호출 실패:', err))
+    );
   }
+
+  // 하나가 실패해도 나머지는 정상 반영되도록 allSettled 사용
+  await Promise.allSettled(tasks);
 }
   </script>
 </body>
