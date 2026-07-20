@@ -79,10 +79,7 @@
     .detail-toggle:hover { background: #1a1208; }
     .detail-toggle .arrow { transition: transform 0.3s; }
     .detail-toggle.open .arrow { transform: rotate(180deg); }
-    /* max-height + overflow-y:auto로 내부 스크롤 박스를 만들었더니 모바일에서
-       터치 스크롤이 페이지 스크롤과 충돌해 안쪽 내용을 끝까지 못 보는 문제가 있어
-       내부 스크롤 자체를 없애고 페이지 스크롤에 맡김 (내용 길이만큼 카드가 자연스럽게 늘어남) */
-    .detail-content { display: none; background: #0d0d0d; border: 1px solid #1e1e1e; border-top: none; border-radius: 0 0 8px 8px; padding: 22px; }
+    .detail-content { display: none; background: #0d0d0d; border: 1px solid #1e1e1e; border-top: none; border-radius: 0 0 8px 8px; padding: 22px; max-height: 420px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .detail-content.open { display: block; }
     .detail-loading { text-align: center; padding: 20px; font-size: 13px; color: #a0845c; animation: blink 1.5s infinite; }
     .detail-text { font-size: 14px; color: #888; line-height: 1.9; white-space: pre-wrap; }
