@@ -132,7 +132,15 @@ ${question}
       throw new Error('Claude 응답 없음');
     }
 
-    return res.status(200).json({ result: text });
+    // 프롬프트로 마크다운 금지를 지시해도 가끔 #, ** 등을 섞어 보낼 때가 있어
+    // textContent로 그대로 렌더링되는 화면 특성상 안전하게 한 번 더 제거
+    const cleanText = text
+      .replace(/^#{1,6}\s*/gm, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
+      .trim();
+
+    return res.status(200).json({ result: cleanText });
 
   } catch (err) {
     console.error('API 오류:', err);
