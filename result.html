@@ -90,6 +90,15 @@
     .missing-btn { width: 100%; padding: 12px; background: #c9a96e; color: #0d0d0d; border: none; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
     .missing-btn:hover { background: #b8956a; }
 
+    /* 대운 */
+    .daeun-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 4px; }
+    .daeun-pillar { flex-shrink: 0; min-width: 62px; text-align: center; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 10px 8px; }
+    .daeun-pillar.current { border-color: #c9a96e; background: #1e1810; }
+    .daeun-pillar-gz { font-size: 15px; color: #c9a96e; margin-bottom: 6px; }
+    .daeun-pillar-age { font-size: 10px; color: #555; }
+    .daeun-pillar.current .daeun-pillar-age { color: #a0845c; }
+    .daeun-pillar-year { font-size: 9px; color: #333; margin-top: 2px; }
+
     /* 태어난 시 역추론 모달 */
     .infer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1000; align-items:center; justify-content:center; padding:20px; }
     .infer-overlay.open { display:flex; }
@@ -173,6 +182,20 @@
       <div class="card radar-card" id="ohengChartCard" style="display:none;">
         <div class="card-label">오행 밸런스</div>
         <div id="ohengRadar" style="display:flex; justify-content:center;"></div>
+      </div>
+
+      <!-- 대운 (10년 단위 인생 흐름) -->
+      <div class="card" id="daeunCard" style="display:none;">
+        <div class="card-label">나의 대운 — 10년 단위 인생 흐름</div>
+        <div class="daeun-scroll" id="daeunScroll"></div>
+        <button class="detail-toggle" id="daeunToggle" onclick="toggleDaeun()" style="margin-top:10px;">
+          <span>🌊 지금 대운 풀이 보기</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="detail-content" id="daeunContent">
+          <div class="detail-loading" id="daeunLoading">도사가 대운을 분석 중입니다...</div>
+          <div class="detail-text" id="daeunText" style="display:none"></div>
+        </div>
       </div>
 
        <!-- 오늘의 운세 확인하기 버튼 -->
@@ -454,6 +477,7 @@
     // 만세력으로 사주 계산
     // =====================
     let baziData = null;
+    let daeunData = null;
     let 오늘오행 = '수';
 
     try {
@@ -518,6 +542,27 @@
         day:   { gan: dayGan,   ji: dayJi   },
         hour:  { gan: hourGan,  ji: hourJi  },
       };
+
+      // 대운 계산 (10년 단위 인생 흐름) — lunar-javascript 내장 기능 사용
+      try {
+        const genderCode = gender === '남성' ? 1 : 0;
+        const yun = bazi.getYun(genderCode);
+        const rawDaeun = yun.getDaYun();
+        const thisYear = new Date().getFullYear();
+        const periods = rawDaeun
+          .filter(d => d.getGanZhi && d.getGanZhi())
+          .map(d => ({
+            ganZhi:    d.getGanZhi(),
+            startYear: d.getStartYear(),
+            endYear:   d.getEndYear(),
+            startAge:  d.getStartAge(),
+            endAge:    d.getEndAge(),
+          }));
+        const currentIdx = periods.findIndex(p => thisYear >= p.startYear && thisYear <= p.endYear);
+        daeunData = { periods, currentIdx, forward: yun.isForward() };
+      } catch (e) {
+        console.log('대운 계산 오류:', e);
+      }
 
       // 오행 카운트
       const 천간오행 = { 甲:'목',乙:'목',丙:'화',丁:'화',戊:'토',己:'토',庚:'금',辛:'금',壬:'수',癸:'수' };
@@ -866,6 +911,79 @@
           document.getElementById('detailLoading').style.display = 'none';
           document.getElementById('detailText').style.display    = 'block';
           document.getElementById('detailText').textContent = '일시적인 오류가 발생했습니다. 다시 시도해주세요.';
+        });
+      }
+    }
+
+    let daeunLoaded = false;
+    async function toggleDaeun() {
+      const toggle  = document.getElementById('daeunToggle');
+      const content = document.getElementById('daeunContent');
+      toggle.classList.toggle('open');
+      content.classList.toggle('open');
+
+      if (!daeunLoaded) {
+        daeunLoaded = true;
+
+        if (!daeunData || daeunData.currentIdx < 0) {
+          document.getElementById('daeunLoading').style.display = 'none';
+          document.getElementById('daeunText').style.display = 'block';
+          document.getElementById('daeunText').textContent = '대운 데이터를 계산할 수 없습니다.';
+          return;
+        }
+
+        // 로그인 유저 확인 + 캐시 체크 (대운은 10년 단위라 날짜별이 아닌 유저별로 캐싱)
+        const user = auth.currentUser;
+        const uid = user ? user.uid : getKakaoUid();
+
+        if (!uid) {
+          document.getElementById('daeunLoading').style.display = 'none';
+          document.getElementById('daeunText').style.display = 'block';
+          document.getElementById('daeunText').textContent =
+            '🔒 구글 또는 카카오 로그인 후 이용할 수 있는 기능입니다.\n첫 화면으로 돌아가서 로그인해주세요.';
+          return;
+        }
+
+        const current = daeunData.periods[daeunData.currentIdx];
+        const cacheRef = db.collection('daeun').doc(uid);
+        const cached = await cacheRef.get();
+        if (cached.exists && cached.data().ganZhi === current.ganZhi) {
+          console.log('대운 캐시 히트! API 호출 안 함');
+          document.getElementById('daeunLoading').style.display = 'none';
+          document.getElementById('daeunText').style.display    = 'block';
+          document.getElementById('daeunText').textContent = cached.data().result;
+          return;
+        }
+
+        const { baziStr, ohengStr } = getBaziOhengStrings();
+
+        fetch('/api/daeun', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name, mbti, bazi: baziStr, oheng: ohengStr, trust, gender, year,
+            ganZhi: current.ganZhi,
+            periodLabel: `${current.startAge}~${current.endAge}세 (${current.startYear}~${current.endYear}년)`,
+            forward: daeunData.forward,
+          }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('daeunLoading').style.display = 'none';
+          document.getElementById('daeunText').style.display    = 'block';
+          document.getElementById('daeunText').textContent = data.result || '분석 결과를 가져오지 못했습니다.';
+          if (uid && data.result) {
+            cacheRef.set({
+              result: data.result,
+              ganZhi: current.ganZhi,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            }).catch(err => console.error('대운 캐시 저장 실패:', err));
+          }
+        })
+        .catch(() => {
+          document.getElementById('daeunLoading').style.display = 'none';
+          document.getElementById('daeunText').style.display    = 'block';
+          document.getElementById('daeunText').textContent = '일시적인 오류가 발생했습니다. 다시 시도해주세요.';
         });
       }
     }
@@ -1227,6 +1345,18 @@ async function loadMenu() {
 
       // 결핍 배너
       if (hour==='unknown') document.getElementById('missingBanner').style.display='block';
+
+      // 대운
+      if (daeunData && daeunData.periods.length) {
+        document.getElementById('daeunCard').style.display = 'block';
+        document.getElementById('daeunScroll').innerHTML = daeunData.periods.map((p, i) => `
+          <div class="daeun-pillar ${i === daeunData.currentIdx ? 'current' : ''}">
+            <div class="daeun-pillar-gz">${p.ganZhi}</div>
+            <div class="daeun-pillar-age">${p.startAge}~${p.endAge}세</div>
+            <div class="daeun-pillar-year">${p.startYear}~${p.endYear}</div>
+          </div>
+        `).join('');
+      }
 
    // 점심 추천 — Claude API 실시간 추천
 document.getElementById('foodSection').style.display = 'block';

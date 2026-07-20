@@ -772,6 +772,7 @@ const query = new URLSearchParams({
               db.collection('pakpok').doc(`${uid}_${today}`).delete(),
               db.collection('fortunes').doc(`${uid}_${today}`).delete(),
               db.collection('menus').doc(`${uid}_${today}`).delete(),
+              db.collection('daeun').doc(uid).delete(),
             ]);
             editMode = false;
             editUid = null;
