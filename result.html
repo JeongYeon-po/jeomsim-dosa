@@ -79,7 +79,10 @@
     .detail-toggle:hover { background: #1a1208; }
     .detail-toggle .arrow { transition: transform 0.3s; }
     .detail-toggle.open .arrow { transform: rotate(180deg); }
-    .detail-content { display: none; background: #0d0d0d; border: 1px solid #1e1e1e; border-top: none; border-radius: 0 0 8px 8px; padding: 22px; max-height: 600px; overflow-y: auto; }
+    /* max-height + overflow-y:auto로 내부 스크롤 박스를 만들었더니 모바일에서
+       터치 스크롤이 페이지 스크롤과 충돌해 안쪽 내용을 끝까지 못 보는 문제가 있어
+       내부 스크롤 자체를 없애고 페이지 스크롤에 맡김 (내용 길이만큼 카드가 자연스럽게 늘어남) */
+    .detail-content { display: none; background: #0d0d0d; border: 1px solid #1e1e1e; border-top: none; border-radius: 0 0 8px 8px; padding: 22px; }
     .detail-content.open { display: block; }
     .detail-loading { text-align: center; padding: 20px; font-size: 13px; color: #a0845c; animation: blink 1.5s infinite; }
     .detail-text { font-size: 14px; color: #888; line-height: 1.9; white-space: pre-wrap; }
@@ -90,10 +93,9 @@
     .missing-btn { width: 100%; padding: 12px; background: #c9a96e; color: #0d0d0d; border: none; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
     .missing-btn:hover { background: #b8956a; }
 
-    /* 대운 — 가로 스크롤 대신 그리드로 전부 한번에 보이게 (모바일에서 스크롤 안내가 안 보여
-       뒤쪽 대운을 못 보는 문제가 있어 스크롤 자체를 없앰) */
-    .daeun-scroll { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
-    .daeun-pillar { min-width: 0; text-align: center; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 10px 6px; }
+    /* 대운 */
+    .daeun-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 4px; }
+    .daeun-pillar { flex-shrink: 0; min-width: 62px; text-align: center; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 10px 8px; }
     .daeun-pillar.current { border-color: #c9a96e; background: #1e1810; }
     .daeun-pillar-gz { font-size: 15px; color: #c9a96e; margin-bottom: 6px; }
     .daeun-pillar-age { font-size: 10px; color: #555; }
