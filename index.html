@@ -372,6 +372,12 @@
     <div class="sub">당신의 하루 마음과 몸을 책임져드립니다</div>
     <div class="copy-main">점은 봐줄게. 점심은 덤이야.</div>
     <div class="copy-sub">사주 · MBTI · 건강 상태로 오늘을 꿰뚫는 AI 도사</div>
+    <!-- 로그인 상태일 때만 showWelcome()에서 노출됨 -->
+    <div id="editInfoWrap" style="display:none; margin-bottom:20px;">
+      <button onclick="openEditFromWelcome()" style="background:none;border:1px solid #2a2a2a;color:#a0845c;padding:8px 18px;font-size:12px;cursor:pointer;border-radius:2px;letter-spacing:1px;">
+        ✏️ 내 정보 수정하기
+      </button>
+    </div>
     <!-- 구글 로그인 버튼 -->
     <button class="cta" onclick="googleLogin()">
       Google로 시작하기
@@ -551,15 +557,76 @@
     let selectedTrust = 2;
     let mbtiDims = { EI: null, SN: null, TF: null, JP: null };
 
-    function showForm() {
+    // 정보 수정 모드 상태
+    let editMode = false;
+    let editUid = null;
+    // 웰컴 화면에서 "내 정보 수정" 버튼이 참조할 현재 로그인 유저 정보
+    let welcomeUid = null;
+    let welcomeData = null;
+
+    // 오늘 날짜 (로컬 기준, result.html의 todayKey()와 동일한 기준을 써야
+    // 캐시 삭제 키가 정확히 맞음)
+    function todayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function showForm(isEdit) {
+      if (!isEdit) {
+        editMode = false;
+        editUid = null;
+        document.querySelector('.form-title').textContent = '도사에게 정보 전달하기';
+        document.getElementById('submitBtn').textContent = '도사에게 물어보기 🔮';
+      }
       document.getElementById('landingPage').style.display = 'none';
       document.getElementById('formPage').style.display = 'block';
       window.scrollTo(0, 0);
     }
 
     function showLanding() {
+      editMode = false;
+      editUid = null;
       document.getElementById('formPage').style.display = 'none';
       document.getElementById('landingPage').style.display = 'flex';
+    }
+
+    // =====================
+    // 내 정보 수정 (기존 폼을 재사용)
+    // =====================
+    function fillFormWithData(data) {
+      setCalType(data.calType || 'solar');
+      document.getElementById('birthYear').value = data.year || '';
+      document.getElementById('birthMonth').value = data.month || '';
+      document.getElementById('birthDay').value = data.day || '';
+      document.getElementById('birthHour').value = data.hour || 'unknown';
+      document.getElementById('userName').value = data.name || '';
+      if (data.gender) setGender(data.gender);
+      if (data.mbti && data.mbti.length === 4) {
+        setMbtiDim('EI', data.mbti[0]);
+        setMbtiDim('SN', data.mbti[1]);
+        setMbtiDim('TF', data.mbti[2]);
+        setMbtiDim('JP', data.mbti[3]);
+      }
+      const trust = data.trust != null ? data.trust : 2;
+      document.getElementById('trustSlider').value = trust;
+      updateSliderText(trust);
+    }
+
+    function enterEditMode(uid, data) {
+      if (!uid || !data) return;
+      editMode = true;
+      editUid = uid;
+      fillFormWithData(data);
+      document.querySelector('.form-title').textContent = '내 정보 수정하기';
+      document.getElementById('submitBtn').textContent = '수정 저장하기 ✏️';
+      showForm(true);
+    }
+
+    function openEditFromWelcome() {
+      enterEditMode(welcomeUid, welcomeData);
     }
 
     function initDateSelects() {
@@ -678,7 +745,8 @@ const query = new URLSearchParams({
      // Firestore에 유저 데이터 저장 (구글 로그인 or 카카오 로그인 유저 모두 지원)
       const googleUser = auth.currentUser;
       const kakaoUser = getKakaoUserObj();
-      const uid = googleUser ? googleUser.uid : (kakaoUser ? kakaoUser.uid : null);
+      const uid = editMode ? editUid : (googleUser ? googleUser.uid : (kakaoUser ? kakaoUser.uid : null));
+      const wasEditMode = editMode;
 
       const goToResultPage = () => { location.href = `result.html?${query}`; };
 
@@ -694,8 +762,20 @@ const query = new URLSearchParams({
           trust:     formData.trustLevel,
           calType:   formData.calType,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        }, { merge: true }).then(() => {
+        }, { merge: true }).then(async () => {
           console.log('유저 데이터 저장 완료!');
+          if (wasEditMode) {
+            // 정보가 바뀌었으니 예전 정보로 만들어진 오늘자 캐시(팩폭/사주상세/메뉴)를
+            // 지워서 결과 페이지에서 새 정보로 다시 생성되게 함
+            const today = todayKey();
+            await Promise.allSettled([
+              db.collection('pakpok').doc(`${uid}_${today}`).delete(),
+              db.collection('fortunes').doc(`${uid}_${today}`).delete(),
+              db.collection('menus').doc(`${uid}_${today}`).delete(),
+            ]);
+            editMode = false;
+            editUid = null;
+          }
           goToResultPage();
         }).catch(err => {
           console.error('유저 데이터 저장 실패:', err);
@@ -804,7 +884,7 @@ async function checkKakaoUser() {
     } else {
       const userDoc = await db.collection('users').doc(data.uid).get();
       if (userDoc.exists) {
-        showWelcome(data.nickname, userDoc.data());
+        showWelcome(data.nickname, userDoc.data(), data.uid);
       } else {
         showForm();
       }
@@ -824,7 +904,7 @@ checkKakaoUser();
 
         if (userDoc.exists) {
           const data = userDoc.data();
-          showWelcome(user.displayName, data);
+          showWelcome(user.displayName, data, user.uid);
         } else {
           showForm();
         }
@@ -837,9 +917,13 @@ checkKakaoUser();
     // =====================
     // 웰컴 멘트 (신뢰도별 랜덤)
     // =====================
-    function showWelcome(displayName, data) {
+    function showWelcome(displayName, data, uid) {
       const name = data.name || displayName.split(' ')[0];
       const trust = data.trust || 2;
+
+      welcomeUid = uid || null;
+      welcomeData = data;
+      document.getElementById('editInfoWrap').style.display = welcomeUid ? 'block' : 'none';
 
       const ments = {
         low: [
