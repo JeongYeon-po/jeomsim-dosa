@@ -902,7 +902,8 @@ checkKakaoUser();
         const userRef = db.collection('users').doc(user.uid);
         const userDoc = await userRef.get();
 
-        if (userDoc.exists) {
+        if (userDoc.exists && userDoc.data().name) {
+          // 이름까지 입력을 마친 유저만 웰컴 화면으로 (프로필 미완성이면 폼으로)
           const data = userDoc.data();
           showWelcome(user.displayName, data, user.uid);
         } else {
@@ -918,7 +919,9 @@ checkKakaoUser();
     // 웰컴 멘트 (신뢰도별 랜덤)
     // =====================
     function showWelcome(displayName, data, uid) {
-      const name = data.name || displayName.split(' ')[0];
+      // 카카오 커스텀 토큰 로그인은 displayName이 null이라 무작정 .split()하면
+      // 죽어서(TypeError), 여러 단계 폴백으로 안전하게 이름을 뽑음
+      const name = data.name || (displayName && displayName.split(' ')[0]) || data.nickname || '회원';
       const trust = data.trust || 2;
 
       welcomeUid = uid || null;
