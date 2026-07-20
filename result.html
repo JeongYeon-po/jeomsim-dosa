@@ -90,6 +90,25 @@
     .missing-btn { width: 100%; padding: 12px; background: #c9a96e; color: #0d0d0d; border: none; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
     .missing-btn:hover { background: #b8956a; }
 
+    /* 태어난 시 역추론 모달 */
+    .infer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    .infer-overlay.open { display:flex; }
+    .infer-modal { background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:26px 22px; max-width:420px; width:100%; max-height:85vh; overflow-y:auto; }
+    .infer-title { font-size:15px; color:#c9a96e; font-weight:600; margin-bottom:6px; }
+    .infer-sub { font-size:12px; color:#555; line-height:1.6; margin-bottom:18px; }
+    .infer-q { margin-bottom:16px; }
+    .infer-q-label { font-size:13px; color:#d4b896; margin-bottom:8px; }
+    .infer-select { width:100%; padding:10px; background:#1a1a1a; border:1px solid #2a2a2a; color:#f5f0e8; border-radius:4px; font-size:13px; font-family:inherit; }
+    .infer-btns { display:flex; gap:8px; margin-top:20px; }
+    .infer-btn-primary { flex:1; padding:13px; background:#c9a96e; color:#0d0d0d; border:none; border-radius:4px; font-size:13px; font-weight:700; cursor:pointer; }
+    .infer-btn-secondary { flex:1; padding:13px; background:transparent; border:1px solid #2a2a2a; color:#666; border-radius:4px; font-size:13px; cursor:pointer; }
+    .infer-loading { display:none; text-align:center; padding:30px 10px; font-size:13px; color:#a0845c; animation: blink 1.5s infinite; }
+    .infer-result { display:none; text-align:center; padding:4px 0; }
+    .infer-result-hour { font-size:22px; color:#c9a96e; font-weight:600; margin-bottom:4px; }
+    .infer-result-range { font-size:12px; color:#555; margin-bottom:14px; }
+    .infer-result-reason { font-size:13px; color:#888; line-height:1.8; margin-bottom:6px; text-align:left; background:#0d0d0d; border:1px solid #1e1e1e; border-radius:6px; padding:14px; }
+    .infer-error { display:none; text-align:center; padding:20px 10px; font-size:12px; color:#E24B4A; }
+
     .food-item { display: flex; gap: 14px; padding: 11px 0; border-bottom: 1px solid #1a1a1a; }
     .food-item:last-child { border-bottom: none; }
     .food-rank { font-size: 11px; color: #a0845c; width: 18px; flex-shrink: 0; padding-top: 2px; }
@@ -239,7 +258,102 @@
       <div class="missing-banner" id="missingBanner" style="display:none">
         <div class="missing-title">⚠️ 정확한 풀이를 위해 하나의 기둥이 부족합니다</div>
         <div class="missing-desc">사주는 년·월·일·시 네 기둥으로 완성됩니다.<br>태어난 시를 모르면 운세의 25%가 빠진 채로 분석됩니다.<br><br>몇 가지 질문으로 태어난 시를 역추론해드릴 수 있습니다.</div>
-        <button class="missing-btn" onclick="alert('태어난 시 역추론 — 다음 업데이트에서 오픈됩니다! 🔮')">내 태어난 시 추론해보기 →</button>
+        <button class="missing-btn" onclick="openInferModal()">내 태어난 시 추론해보기 →</button>
+      </div>
+
+      <!-- 태어난 시 역추론 모달 -->
+      <div class="infer-overlay" id="inferOverlay">
+        <div class="infer-modal">
+          <div id="inferStepQuestions">
+            <div class="infer-title">🔮 태어난 시 역추론</div>
+            <div class="infer-sub">몇 가지 질문에 답하면 도사가 사주와 성향을 종합해 가장 가능성 높은 태어난 시를 추론해드립니다. (참고용이며 100% 정확하지 않을 수 있어요)</div>
+
+            <div class="infer-q">
+              <div class="infer-q-label">1. 평소 컨디션이 가장 좋은 시간대는?</div>
+              <select class="infer-select" id="iq1">
+                <option value="">선택해주세요</option>
+                <option value="새벽(밤 11시~새벽 3시)에 오히려 정신이 맑아진다">새벽(밤 11시~새벽 3시)에 오히려 정신이 맑아진다</option>
+                <option value="이른 아침(3시~7시)에 눈이 잘 떠지고 개운하다">이른 아침(3시~7시)에 눈이 잘 떠지고 개운하다</option>
+                <option value="오전(7시~11시)에 가장 활기차다">오전(7시~11시)에 가장 활기차다</option>
+                <option value="한낮(11시~15시)에 집중력이 최고조다">한낮(11시~15시)에 집중력이 최고조다</option>
+                <option value="늦은 오후(15시~19시)에 에너지가 오른다">늦은 오후(15시~19시)에 에너지가 오른다</option>
+                <option value="저녁~밤(19시~23시)에 오히려 생기가 돈다">저녁~밤(19시~23시)에 오히려 생기가 돈다</option>
+              </select>
+            </div>
+
+            <div class="infer-q">
+              <div class="infer-q-label">2. 어릴 때 부모님이 자주 하신 말은?</div>
+              <select class="infer-select" id="iq2">
+                <option value="">선택해주세요</option>
+                <option value="예민하고 잘 놀라는 편이었다">예민하고 잘 놀라는 편이었다</option>
+                <option value="순하고 잠이 많았다">순하고 잠이 많았다</option>
+                <option value="호기심 많고 가만히 못 있었다">호기심 많고 가만히 못 있었다</option>
+                <option value="고집 세고 자기 주장이 강했다">고집 세고 자기 주장이 강했다</option>
+                <option value="애교 많고 사람을 잘 따랐다">애교 많고 사람을 잘 따랐다</option>
+                <option value="차분하고 어른스러웠다">차분하고 어른스러웠다</option>
+              </select>
+            </div>
+
+            <div class="infer-q">
+              <div class="infer-q-label">3. 나의 에너지 유형에 가장 가까운 건?</div>
+              <select class="infer-select" id="iq3">
+                <option value="">선택해주세요</option>
+                <option value="한번 몰아치면 폭발적인 추진력">한번 몰아치면 폭발적인 추진력</option>
+                <option value="꾸준하고 지구력 있게 밀고 나가는 편">꾸준하고 지구력 있게 밀고 나가는 편</option>
+                <option value="느긋하고 여유롭게 흘러가는 편">느긋하고 여유롭게 흘러가는 편</option>
+                <option value="예민하게 촉이 빠르고 눈치가 빠른 편">예민하게 촉이 빠르고 눈치가 빠른 편</option>
+              </select>
+            </div>
+
+            <div class="infer-q">
+              <div class="infer-q-label">4. 사람들과 있을 때 나는?</div>
+              <select class="infer-select" id="iq4">
+                <option value="">선택해주세요</option>
+                <option value="자연스럽게 분위기를 이끄는 리더형">자연스럽게 분위기를 이끄는 리더형</option>
+                <option value="뒤에서 조율하고 챙기는 서포터형">뒤에서 조율하고 챙기는 서포터형</option>
+                <option value="혼자 있는 게 훨씬 편한 독립형">혼자 있는 게 훨씬 편한 독립형</option>
+                <option value="분위기 메이커, 사람들과 어울리는 게 좋은 사교형">분위기 메이커, 사람들과 어울리는 게 좋은 사교형</option>
+              </select>
+            </div>
+
+            <div class="infer-q">
+              <div class="infer-q-label">5. 잠버릇이나 수면 패턴은?</div>
+              <select class="infer-select" id="iq5">
+                <option value="">선택해주세요</option>
+                <option value="예민해서 잘 뒤척이고 얕게 잔다">예민해서 잘 뒤척이고 얕게 잔다</option>
+                <option value="한번 자면 업어가도 모르게 깊이 잔다">한번 자면 업어가도 모르게 깊이 잔다</option>
+                <option value="자다가도 잘 깨는 편이다">자다가도 잘 깨는 편이다</option>
+                <option value="눕자마자 금방 잠드는 편이다">눕자마자 금방 잠드는 편이다</option>
+              </select>
+            </div>
+
+            <div class="infer-btns">
+              <button class="infer-btn-secondary" onclick="closeInferModal()">닫기</button>
+              <button class="infer-btn-primary" onclick="submitInferHour()">추론하기 🔮</button>
+            </div>
+          </div>
+
+          <div class="infer-loading" id="inferLoading">도사가 태어난 시를 추론하는 중...</div>
+
+          <div class="infer-result" id="inferResultBox">
+            <div class="infer-title">🔮 추론 결과</div>
+            <div class="infer-result-hour" id="inferResultHour"></div>
+            <div class="infer-result-range" id="inferResultRange"></div>
+            <div class="infer-result-reason" id="inferResultReason"></div>
+            <div class="infer-btns">
+              <button class="infer-btn-secondary" onclick="closeInferModal()">다음에 하기</button>
+              <button class="infer-btn-primary" onclick="applyInferredHour()">이 시간으로 적용하기</button>
+            </div>
+          </div>
+
+          <div class="infer-error" id="inferErrorBox">
+            추론에 실패했습니다. 잠시 후 다시 시도해주세요.
+            <div class="infer-btns">
+              <button class="infer-btn-secondary" onclick="closeInferModal()">닫기</button>
+              <button class="infer-btn-primary" onclick="submitInferHour()">다시 시도</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 점심 추천 -->
@@ -955,6 +1069,84 @@ async function loadMenu() {
     `).join('');
   }
 }
+    // =====================
+    // 태어난 시 역추론
+    // =====================
+    const 시진범위 = {
+      '자시':'23:00 ~ 01:00', '축시':'01:00 ~ 03:00', '인시':'03:00 ~ 05:00', '묘시':'05:00 ~ 07:00',
+      '진시':'07:00 ~ 09:00', '사시':'09:00 ~ 11:00', '오시':'11:00 ~ 13:00', '미시':'13:00 ~ 15:00',
+      '신시':'15:00 ~ 17:00', '유시':'17:00 ~ 19:00', '술시':'19:00 ~ 21:00', '해시':'21:00 ~ 23:00',
+    };
+    let inferredHourValue = null;
+
+    function openInferModal() {
+      document.getElementById('inferOverlay').classList.add('open');
+      document.getElementById('inferStepQuestions').style.display = 'block';
+      document.getElementById('inferLoading').style.display = 'none';
+      document.getElementById('inferResultBox').style.display = 'none';
+      document.getElementById('inferErrorBox').style.display = 'none';
+    }
+    function closeInferModal() {
+      document.getElementById('inferOverlay').classList.remove('open');
+    }
+
+    async function submitInferHour() {
+      const qEls = ['iq1','iq2','iq3','iq4','iq5'].map(id => document.getElementById(id));
+      if (qEls.some(el => !el.value)) { alert('모든 질문에 답해주세요!'); return; }
+      const answers = qEls.map(el => ({ q: el.previousElementSibling.textContent, a: el.value }));
+
+      document.getElementById('inferStepQuestions').style.display = 'none';
+      document.getElementById('inferErrorBox').style.display = 'none';
+      document.getElementById('inferResultBox').style.display = 'none';
+      document.getElementById('inferLoading').style.display = 'block';
+
+      try {
+        const res = await fetch('/api/inferhour', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, mbti, year, month, day, gender, answers }),
+        });
+        if (!res.ok) throw new Error('요청 실패');
+        const data = await res.json();
+        if (!data.hour || !시진범위[data.hour]) throw new Error('잘못된 응답');
+
+        inferredHourValue = data.hour;
+        document.getElementById('inferResultHour').textContent = data.hour;
+        document.getElementById('inferResultRange').textContent = 시진범위[data.hour];
+        document.getElementById('inferResultReason').textContent = data.reason || '';
+        document.getElementById('inferLoading').style.display = 'none';
+        document.getElementById('inferResultBox').style.display = 'block';
+      } catch (e) {
+        console.error('시주 추론 실패:', e);
+        document.getElementById('inferLoading').style.display = 'none';
+        document.getElementById('inferErrorBox').style.display = 'block';
+      }
+    }
+
+    async function applyInferredHour() {
+      if (!inferredHourValue) return;
+      const user = auth.currentUser;
+      const uid = user ? user.uid : getKakaoUid();
+
+      const newParams = new URLSearchParams(window.location.search);
+      newParams.set('hour', inferredHourValue);
+
+      if (uid) {
+        try {
+          await db.collection('users').doc(uid).set({ hour: inferredHourValue }, { merge: true });
+          const today = todayKey();
+          await Promise.allSettled([
+            db.collection('pakpok').doc(`${uid}_${today}`).delete(),
+            db.collection('fortunes').doc(`${uid}_${today}`).delete(),
+            db.collection('menus').doc(`${uid}_${today}`).delete(),
+          ]);
+        } catch (e) {
+          console.error('시주 적용 저장 실패:', e);
+        }
+      }
+      location.href = `result.html?${newParams.toString()}`;
+    }
+
     // =====================
     // 렌더링
     // =====================
